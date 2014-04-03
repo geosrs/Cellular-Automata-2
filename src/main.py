@@ -12,7 +12,7 @@ def main():
 	tk.createBaseStyles(root)
 	app = StartScreen(root)
 	app.mainloop()
-	
+
 class WindowManager(object):
 	'''Main Window Manager'''
 	def __init__(self, master):

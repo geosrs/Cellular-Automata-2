@@ -1,0 +1,48 @@
+ <html>
+	<title>HTML CA Test</title>
+	<body>
+		This is a test of the HTML Canvas.
+		Notes: 
+		<ul>
+		<li>I don't have any of the wrapping done yet (so edges don't wrap to the other side) because there aren't negative array indices in JavaScript, but I can work on that later.</li>
+		</ul>
+		<hr/>
+		<canvas id = "test-canvas" height = "400" width = "800"></canvas>
+	</body>
+	<script type = "text/javascript">
+		// Note: you don't need to use "var" for every variable, but it allows the garbage collector to handle memory more efficiently
+		var canvas = document.getElementById("test-canvas"); // get the canvas element
+		var draw = canvas.getContext("2d"); // get a 2D context to draw on
+		draw.fillStyle = "#FFFFFF";
+		draw.fillRect(0, 0, canvas.width, canvas.height); // set the background to white
+		draw.fillStyle = "#000000"; // set new filling colors to black
+		var cellspace = new Array();
+		for (var i = 0; i <= canvas.width; i ++) {
+			cellspace.push(0); // I'm not sure if it is possible to automatically set the array values like in Python
+			}
+		cellspace[Math.floor(canvas.width / 2)] = 1;
+		for (var y = 0; y <= canvas.height; y ++) {
+			newcellspace = new Array();
+			console.log(y);
+			for (var x = 0; x <= canvas.width; x ++) {
+				if (cellspace[x - 1] == 1 && cellspace[x] == 0 && cellspace[x + 1 % 401] == 0) {
+					draw.fillRect(x, y, 1, 1);
+					newcellspace.push(1);
+					}
+				else if (cellspace[x - 1] == 0 && cellspace[x] == 1 && cellspace[x + 1 % 401] == 0) {
+					draw.fillRect(x, y, 1, 1);
+					newcellspace.push(1);
+					}
+				else if (cellspace[x - 1] == 0 && cellspace[x] == 0 && cellspace[x + 1 % 401] == 1) {
+					draw.fillRect(x, y, 1, 1);
+					newcellspace.push(1);
+					}
+				else {
+					newcellspace.push(0);
+					}
+				}
+			cellspace = newcellspace.slice(0);
+			}
+
+	</script>
+ </html>
