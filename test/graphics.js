@@ -5,7 +5,7 @@
 
 function GraphWin(id, options) {
 	// Creates a GraphWin Object
-	canvas = document.getElementByid(id);
+	canvas = document.getElementById(id);
 	canvas.width = is_null(options.width) ? canvas.width: options.width;
 	canvas.height = is_null(options.height) ? canvas.height: options.height;
 	return {
