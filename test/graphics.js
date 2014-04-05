@@ -221,6 +221,8 @@ function GraphWin(id, userOptions) {
 function GraphicsObject(options) {
 	// Generic GraphicsObject (base for other classes)
 	var obj = copy(options, {
+		x: 0,
+		y: 0,
 		fill: null,
 		outline: getColor("black"),
 		draw: function(graphWin) {
@@ -252,8 +254,6 @@ function Rectangle(options) {
 	var graphObj = new GraphicsObject(options);
 	var rectangle = copy(graphObj, {
 		type: RECT,
-		x: 0,
-		y: 0,
 		width: 10,
 		height: 10,
 		});
@@ -270,8 +270,6 @@ function Circle(options) {
 	var graphObj = new GraphicsObject(options);
 	var circle = copy(graphObj, {
 		type: ARC,
-		x: 0,
-		y: 0,
 		radius: 10,
 		});
 	return circle;
@@ -289,8 +287,6 @@ function Text(options) {
 	var graphObj = new GraphicsObject(options);
 	var text = copy(graphObj, {
 		type: TEXT,
-		x: 0,
-		y: 0,
 		text: "Hello, World!",
 		size: 14,
 		font: "Calibri",

@@ -1,0 +1,128 @@
+/*
+styles.css - contains custom styling
+*/
+
+@import url("//mandeltech.com/lib/styles/custom_styles.css");
+
+/* Direct element rules */
+
+td {
+	padding: 10px;
+	}
+
+h1, h2, h3, h3, h4, h5, h6 {
+	font-family: Helvetica Light;	
+	}
+
+body {
+	}
+	
+/* Class rules */
+
+.navbar-custom, .show-button, .hover-text-hidden {
+	transition: all 0.5s ease;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	}
+
+.btn-custom {
+	color: orange;
+	border-color: orange;
+	background: white;
+	}
+
+.btn-custom:hover {
+	color: white;
+	background: orange;
+	}
+
+.btn-inverse {
+	color: white;
+	border-color: white;
+	background: orange;
+	}
+
+.btn-inverse:hover {
+	color: orange;
+	background: white;
+	}
+	
+.navbar-custom {
+	opacity: 0.8 !important;
+	}
+
+.nav-button {
+	}
+
+.navbar-custom:hover {
+	opacity: 1 !important;
+	}
+
+.margin-body {
+	margin: 20px;
+	text-align: center;
+	}
+
+.center {
+	margin: auto;
+	}
+
+.hover-text-hidden {
+	font-size: 0px;
+	vertical-align: middle;
+	transition: font 0.2s;
+	}
+
+.show-hover {
+	display: block;
+	text-align: center;
+	}
+
+.show-hover:hover .hover-text-hidden, .hover-text-active {
+	font-size: 20px;
+	vertical-align: middle;
+	}
+
+/* ID-based rules */
+
+#footer {
+	text-align: center;
+	}
+
+#back-mandeltech-button:hover, #back-mandeltech-button-active {
+	color: blue;
+	}
+
+#home-button:hover, #home-button-active {
+	color: maroon;
+	}
+
+#ideas-button:hover, #ideas-button-active {
+	color: orange;
+	}
+
+#add-idea-button:hover, #add-idea-button-active {
+	color: green;
+	}
+
+#about-button:hover, #about-button-active {
+	color: red;
+	}
+
+#help-button:hover, #help-button-active {
+	color: royalblue;
+	}
+
+/* Mobile optimized */
+
+@media (max-width: 768px) {
+	.hover-text-hidden {
+		font-size: 20px;
+		}
+
+	.show-hover {
+		text-align: left;
+		}
+
+	}
