@@ -9,7 +9,7 @@
 		</ul>
 		<hr/>
 		<a download = "image.png" href = "" id = "download-ca"><button onclick = "graph.setDownload('download-ca')">Download</button></a><br/>
-		<canvas id = "ca-graph" height = "400" width = "800"></canvas>
+		<canvas id = "ca-graph" height = "800" width = "800"></canvas>
 	</body>
 	<script src = "graphics.js"></script>
 	<script type = "text/javascript">
@@ -34,15 +34,16 @@
 		var id = setInterval(function() { // automatically updates the screen
 			newcellspace = new Array();
 			for (var x = 0; x <= graph.getWidth(); x ++) {
-				if (cellspace[x - 1] == 1 && cellspace[x] == 0 && cellspace[x + 1 % 401] == 0) {
+				var a = cellspace.get(x - 1), b = cellspace.get(x), c = cellspace.get(x + 1);
+				if (a == 1 && b == 0 && c == 0) {
 					graph.plot(x, y);
 					newcellspace.push(1);
 					}
-				else if (cellspace[x - 1] == 0 && cellspace[x] == 1 && cellspace[x + 1 % 401] == 0) {
+				else if (a == 0 && b == 1 && c == 0) {
 					graph.plot(x, y);
 					newcellspace.push(1);
 					}
-				else if (cellspace[x - 1] == 0 && cellspace[x] == 0 && cellspace[x + 1 % 401] == 1) {
+				else if (a == 0 && b == 0 && c == 1) {
 					graph.plot(x, y);
 					newcellspace.push(1);
 					}

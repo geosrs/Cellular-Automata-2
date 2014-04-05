@@ -10,6 +10,7 @@ var STROKE = 1;
 var RECT = 0;
 var ARC = 1;
 var TEXT = 2;
+var LINE = 3;
 
 // 140 Standard Web Colors + white + black
 var COLORS = {gold: "#FFD700", firebrick: "#B22222", yellow: "#FFFF00", darkolivegreen: "#556B2F", 
@@ -75,6 +76,53 @@ function GraphWin(id, userOptions) {
 			mouseX: 0,
 			mouseY: 0,
 			},
+		transform: {
+			exists: false,
+			x1: 0,
+			x2: 0,
+			y1: 0,
+			y2: 0,
+			custom: function(x, y) {
+				// Transforms pixels into custom coordinates
+				return this.exists ? {
+					x: (x / this.canvas.width) * (this.x2 - this.x1) + this.x1,
+					y: (1 - y / this.canvas.height) * (this.y2 - this.y1) + this.y1,
+					}: {x: x, y: y};
+				},
+			real: function(x, y) {
+				// Transforms custom coordinates into real coordinates
+				return this.exists ? {
+					x: (x / (this.x2 - this.x1)) * this.canvas.width,
+					y: (1 - y / (this.y2 - this.y1)) * this.canvas.height,
+					}: {x: x, y: y};
+				},
+			distance: function(x1, y1, x2, y2) {
+				// Returns the distance between two points (custom coordinates)
+				return Math.sqrt((Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
+				},
+			translate: function(width, height, radius) {
+				// Translates width, height, and radius into real coordinates
+				var transformed = this.real(radius, radius);
+				return this.exists? {
+					width: (this.x2 - this.x1) * width,
+					height: (this.y2 - this.y1) * height,
+					radius: this.distance(0, 0, transformed.x, transformed.y),
+					}: {width: width, height: height, radius: radius};
+				},
+			},
+		setCoords: function(x1, y1, x2, y2) {
+			/* Sets the custom coordinates of the window, with (x1, y1) as the bottom left corner
+			and (x2, y2) as the top right corner of the GraphWin
+			*/
+			this.transform.exists = true;
+			this.transform.x1 = x1, this.transform.x2 = x2, this.transform.y1 = y1, this.transform.y2 = y2;
+			this.transform.canvas = this.canvas;
+			return this.transform;
+			},
+		resetCoords: function() {
+			// Resets the custom coordinates to normal, pixel coordinates
+			this.transform.exists = false;
+			},
 		setColor: function(color, method) {
 			// Sets the current drawing color
 			var method = exists(method) ? method: FILL;
@@ -104,10 +152,15 @@ function GraphWin(id, userOptions) {
 			return value;
 			},
 		setBackground: function(color) {
+			// Sets the background of the GraphWin
 			var color = getColor(color);
 			this.setStyle("background", color);
 			this.config.background = color;
 			return color;
+			},
+		getColor: function(type) {
+			// Returns the current color
+			return (type == FILL) ? this.context.fillStyle: this.context.strokeStyle;
 			},
 		clear: function () {
 			// Clears the canvas
@@ -116,8 +169,8 @@ function GraphWin(id, userOptions) {
 			},
 		plot: function(x, y, color) {
 			// Colors the pixel (x, y) a specific color
-			exists(color) ? this.setColor(color): null;
-			this.context.fillRect(x, y, 1, 1);
+			var color = exists(color) ? color: this.getColor(FILL);
+			this.draw({x: x, y: y, width: 1, height: 1, type: RECT, fill: color, outline: color});
 			},
 		getHeight: function() {
 			// Returns the height of the GraphWin
@@ -153,9 +206,10 @@ function GraphWin(id, userOptions) {
 			},
 		getMouse: function() {
 			// Gets the current mouse position
+			var transformed = this.transform.custom(this.config.mouseX, this.config.mouseY);
 			return {
-				x: this.config.mouseX,
-				y: this.config.mouseY,
+				x: point.x,
+				y: point.y,
 				};
 			},
 		getData: function() {
@@ -171,25 +225,27 @@ function GraphWin(id, userOptions) {
 		draw: function(obj) {
 			// Draws the object to the GraphWin
 			var type = obj.type;
+			var point = this.transform.real(obj.x, obj.y);
+			var transformed = this.transform.translate(obj.width, obj.height, obj.radius);
 			if (type == RECT) {
 				if (exists(obj.fill)) {
 					this.setColor(obj.fill, FILL);
-					this.context.fillRect(obj.x, obj.y, obj.width, obj.height);
+					this.context.fillRect(point.x, point.y, transformed.width, transformed.height);
 					}
 				if (obj.fill != obj.outline) {
 					this.setColor(obj.outline, STROKE);
-					this.context.strokeRect(obj.x, obj.y, obj.width, obj.height);
+					this.context.strokeRect(point.x, point.y, transformed.width, transformed.height);
 					}
 				}
 			else if (type == ARC) {
 				if (exists(obj.fill)) {
 					this.setColor(obj.fill, FILL);
-					this.context.arc(obj.x, obj.y, obj.radius, 0, 2 * Math.PI);
+					this.context.arc(point.x, point.y, transformed.radius, 0, 2 * Math.PI);
 					this.context.fill();
 					}
 				if (obj.fill != obj.outline) {
 					this.setColor(obj.outline, STROKE);
-					this.context.arc(obj.x, obj.y, obj.radius, 0, 2 * Math.PI);
+					this.context.arc(point.x, point.y, transformed.radius, 0, 2 * Math.PI);
 					this.context.stroke();
 					}
 				}
@@ -197,12 +253,22 @@ function GraphWin(id, userOptions) {
 				this.setFont(obj.font, obj.size);
 				if (exists(obj.fill)) {
 					this.setColor(obj.fill, FILL);
-					this.context.fillText(obj.text, obj.x, obj.y);
+					this.context.fillText(obj.text, point.x, point.y);
 					}
 				if (obj.fill != obj.outline) {
 					this.setColor(obj.outline, STROKE);
-					this.context.strokeText(obj.text, obj.x, obj.y);
+					this.context.strokeText(obj.text, point.x, point.y);
 					}
+				}
+			else if (type == LINE) {
+				this.setColor(exists(obj.fill) ? obj.fill: obj.outline, STROKE);
+				if (exists(obj.width)) {
+					this.context.lineWidth = obj.width;
+					}
+				this.context.beginPath();
+				this.context.moveTo(obj.x1, obj.y1);
+				this.context.lineTo(obj.x2, obj.y2);
+				this.context.stroke();
 				}
 			return type;
 			},
@@ -221,6 +287,8 @@ function GraphWin(id, userOptions) {
 function GraphicsObject(options) {
 	// Generic GraphicsObject (base for other classes)
 	var obj = copy(options, {
+		id: hex(Date.now()) + hex(Math.random().toString().replace('.', '')),
+		graph: null,
 		x: 0,
 		y: 0,
 		fill: null,
@@ -228,22 +296,27 @@ function GraphicsObject(options) {
 		draw: function(graphWin) {
 			// Draws the object onto the graphWin
 			graphWin.draw(this);
+			this.graph = graph;
+			},
+		config: function(attribute, value) {
+			// Sets the attribute to value
+			this[attribute] = value;
+			exists(this.graph) ? this.draw(this.graph): null;
+			return value;
 			},
 		setFill: function(color) {
 			// Sets the fill color of the object
-			this.fill = getColor(color);
-			return this.fill;
+			return this.config("fill", getColor(color));
 			},
 		setOutline: function(color) {
 			// Sets the outline color of the object
-			this.outline = getColor(color);
-			return this.outline;
+			return this.config("outline", getColor(color));
 			},
 		});
 	return obj;
 	}
 	
-function Rectangle(options) {
+function Rectangle(x, y, width, height) {
 	/* Rectangle class
 	Options can be:
 		x: left-most x value
@@ -251,7 +324,7 @@ function Rectangle(options) {
 		width: width of rectangle
 		height: height of rectangle
 	*/
-	var graphObj = new GraphicsObject(options);
+	var graphObj = new GraphicsObject({x: x, y: y, width: width, height: height});
 	var rectangle = copy(graphObj, {
 		type: RECT,
 		width: 10,
@@ -260,14 +333,14 @@ function Rectangle(options) {
 	return rectangle;
 	}
 	
-function Circle(options) {
+function Circle(x, y, radius) {
 	/* Circle class
 		options include:
 			x - center of circle (x)
 			y - center of circle (y)
 			radius - radius of the circle
 	*/
-	var graphObj = new GraphicsObject(options);
+	var graphObj = new GraphicsObject({x: x, y: y, radius: radius});
 	var circle = copy(graphObj, {
 		type: ARC,
 		radius: 10,
@@ -275,7 +348,7 @@ function Circle(options) {
 	return circle;
 	}
 	
-function Text(options) {
+function Text(x, y, text, size, font) {
 	/* Text class
 		options include:
 			x - left-most coordinate (x) of text
@@ -284,7 +357,7 @@ function Text(options) {
 			size - font size to display text in (in pixels)
 			font - font family to use when displaying text
 	*/
-	var graphObj = new GraphicsObject(options);
+	var graphObj = new GraphicsObject({x: x, y: y, text: text, size: size, font: font});
 	var text = copy(graphObj, {
 		type: TEXT,
 		text: "Hello, World!",
@@ -292,6 +365,30 @@ function Text(options) {
 		font: "Calibri",
 		});
 	return text;
+	}
+	
+function Line(x1, y1, x2, y2) {
+	/* Line class
+		options include:
+			x1 - x value of first coordinate
+			y1 - y value of first coordinate
+			x2 - x value of second coordinate
+			y2 - y value of second coordinate
+	*/
+	var graphObj = new GraphicsObject({x1: x1, y1: y1, x2: x2, y2: y2});
+	var line = copy(graphObj, {
+		type: LINE,
+		x1: 0,
+		y1: 0,
+		x2: 10,
+		y2: 10,
+		width: null,
+		setWidth: function(width) {
+			// Sets the width of the line
+			return this.config("width", width);
+			},
+		});
+	return line;
 	}
 	
 // Miscellaneous functions
@@ -316,7 +413,7 @@ function getColor(color) {
 function copy(from, to) {
 	// Copies the attributes in "from" and "to"
 	for (var key in from) {
-		if (from.hasOwnProperty(key)) {
+		if (from.hasOwnProperty(key) && exists(from[key])) {
 			to[key] = from[key];
 			}
 		}
@@ -332,4 +429,12 @@ function exists(x) {
 	// Checks whether or not the value exists
 	return (x != null && x != "undefined");
 	}
+	
+Array.prototype.get = function(index) {
+	// Allows for index wrapping
+	var length = this.length;
+	var index = index % length;
+	return index < 0 ? this[length + index]: this[index];
+	}
+	
 	
