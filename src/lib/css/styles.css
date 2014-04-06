@@ -2,7 +2,7 @@
 styles.css - contains custom styling
 */
 
-@import url("http://mandeltech.com/lib/styles/custom_styles.css");
+@import url("//mandeltech.com/lib/styles/custom_styles.css");
 
 /* Direct element rules */
 
@@ -11,7 +11,8 @@ td {
 	}
 
 h1, h2, h3, h3, h4, h5, h6 {
-	font-family: Helvetica Light;	
+	font-family: Helvetica Light;
+	font-weight: lighter;
 	}
 
 body {
@@ -62,6 +63,8 @@ body {
 .margin-body {
 	margin: 20px;
 	text-align: center;
+	vertical-align: middle;
+	margin: auto;
 	}
 
 .center {
@@ -84,34 +87,17 @@ body {
 	vertical-align: middle;
 	}
 
+.canvas-back {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	}
+	
 /* ID-based rules */
 
 #footer {
 	text-align: center;
-	}
-
-#back-mandeltech-button:hover, #back-mandeltech-button-active {
-	color: blue;
-	}
-
-#home-button:hover, #home-button-active {
-	color: maroon;
-	}
-
-#ideas-button:hover, #ideas-button-active {
-	color: orange;
-	}
-
-#add-idea-button:hover, #add-idea-button-active {
-	color: green;
-	}
-
-#about-button:hover, #about-button-active {
-	color: red;
-	}
-
-#help-button:hover, #help-button-active {
-	color: royalblue;
 	}
 
 /* Mobile optimized */

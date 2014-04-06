@@ -15,7 +15,6 @@ require "functions.php";
 	<body>
 		<div class = "margin-body" id = "body-div">
 			<!-- Content goes here -->
-			
 		</div>
 	</body>
 	<?php get_element("footer"); ?>

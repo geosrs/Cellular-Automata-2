@@ -60,3 +60,15 @@ function replaceAll(string, substring, repl) {
 	return string.replace(re, repl);
 	}
 	
+Array.prototype.get = function(index) {
+	// Allows for index wrapping
+	var length = this.length;
+	var index = index % length;
+	return index < 0 ? this[length + index]: this[index];
+	}
+	
+String.prototype.repeat = function(n) {
+	// Repeats a string "n" times
+	return new Array(n + 1).join(this);
+	}
+	

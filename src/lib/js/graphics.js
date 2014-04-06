@@ -269,8 +269,9 @@ function GraphWin(id, userOptions) {
 				this.context.moveTo(obj.x1, obj.y1);
 				this.context.lineTo(obj.x2, obj.y2);
 				this.context.stroke();
+				this.context.closePath();
 				}
-			return type;
+			return obj;
 			},
 		};
 	
