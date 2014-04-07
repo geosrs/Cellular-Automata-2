@@ -2,6 +2,14 @@
 
 // functions.php --- contains common functions
 
+?>
+
+<script type = "text/javascript">
+	var DATA = <?php echo file_get_contents("lib/data.json"); ?>
+</script>
+
+<?php
+
 $TITLE = "Cellular Automata Project";
 $HOME_DIR = "http://mandeltech.com";
 
