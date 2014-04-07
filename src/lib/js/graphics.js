@@ -151,11 +151,13 @@ function GraphWin(id, userOptions) {
 			this.canvas.style[rule] = value;
 			return value;
 			},
-		setBackground: function(color) {
+		setBackground: function(color, force) {
 			// Sets the background of the GraphWin
 			var color = getColor(color);
 			this.setStyle("background", color);
 			this.config.background = color;
+			(exists(force) && force) ? this.draw({x: 0, y: 0, width: this.getWidth(), 
+				height: this.getHeight(), fill: color, outline: color, type: RECT}): null;
 			return color;
 			},
 		getColor: function(type) {
@@ -206,7 +208,7 @@ function GraphWin(id, userOptions) {
 			},
 		getMouse: function() {
 			// Gets the current mouse position
-			var transformed = this.transform.custom(this.config.mouseX, this.config.mouseY);
+			var point = this.transform.custom(this.config.mouseX, this.config.mouseY);
 			return {
 				x: point.x,
 				y: point.y,
@@ -394,11 +396,6 @@ function Line(x1, y1, x2, y2) {
 	
 // Miscellaneous functions
 	
-function hex(n) {
-	// Returns the hex representation of decimal n
-	return Number(n).toString(16);
-	}
-	
 function color_rgb(r, g, b) {
 	// Returns the color's (r, g, b) value in hex
 	return (hex(r) + hex(g) + hex(b)).toUpperCase();
@@ -410,32 +407,4 @@ function getColor(color) {
 	var hexColor = exists(hexColorAttempt) ? hexColorAttempt: color;
 	return hexColor;
 	}
-	
-function copy(from, to) {
-	// Copies the attributes in "from" and "to"
-	for (var key in from) {
-		if (from.hasOwnProperty(key) && exists(from[key])) {
-			to[key] = from[key];
-			}
-		}
-	return to;
-	}
-	
-function is_null(x) {
-	// Checks whether or not the variable is null
-	return (x == null || x == "undefined");
-	}
-
-function exists(x) {
-	// Checks whether or not the value exists
-	return (x != null && x != "undefined");
-	}
-	
-Array.prototype.get = function(index) {
-	// Allows for index wrapping
-	var length = this.length;
-	var index = index % length;
-	return index < 0 ? this[length + index]: this[index];
-	}
-	
 	

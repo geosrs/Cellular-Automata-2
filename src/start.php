@@ -20,7 +20,7 @@ require "functions.php";
 			<h2>Welcome to <?php echo $TITLE;?></h2>
 			<br/>
 			<a href = "index"><button class = "btn btn-custom">Home</button></a><br/><br/>
-			<a href = "options"><button class = "btn btn-custom">
+			<a href = "automata"><button class = "btn btn-custom">
 					Start&nbsp;&nbsp; <i class = "iconfont-20 fa fa-arrow-circle-o-right"></i>
 			</button></a>
 		</div>

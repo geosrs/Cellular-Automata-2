@@ -20,7 +20,7 @@ body {
 	
 /* Class rules */
 
-.navbar-custom, .show-button, .hover-text-hidden {
+.navbar-custom, .show-button, .hover-text-hidden, .options-sidebar {
 	transition: all 0.5s ease;
 	-webkit-transition: all 0.5s;
 	-moz-transition: all 0.5s;
@@ -38,17 +38,25 @@ body {
 	background: orange;
 	}
 
-.btn-inverse {
+.btn-custom:focus, .btn-custom:active:focus {
+	outline-color: orange;
+	}
+
+.btn-custom-inverse, .btn-custom-inverse:focus {
 	color: white;
 	border-color: white;
 	background: orange;
 	}
 
-.btn-inverse:hover {
+.btn-custom-inverse:hover {
 	color: orange;
 	background: white;
 	}
-	
+
+.btn-custom-inverse:focus, .btn-custom-inverse:active:focus {
+	outline-color: white;
+	}
+
 .navbar-custom {
 	opacity: 0.8 !important;
 	}
@@ -69,6 +77,7 @@ body {
 
 .center {
 	margin: auto;
+	text-align: center;
 	}
 
 .hover-text-hidden {
@@ -94,6 +103,25 @@ body {
 	z-index: -1;
 	}
 	
+.options-sidebar {
+	position: fixed;
+	left: 0;
+	opacity: 0.6;
+	padding: 20px;
+	}
+
+.options-sidebar:hover {
+	opacity: 1;
+	}
+
+.opt-page-title {
+	color: green;
+	}
+
+.fixed-input {
+	width: 200px;
+	}
+
 /* ID-based rules */
 
 #footer {

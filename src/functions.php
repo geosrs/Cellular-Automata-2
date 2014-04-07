@@ -56,4 +56,32 @@ $HTML_ELEMENTS = Array(
 	"title" => $TITLE,
 	);
 
+function getFromArray($array, $key, $default) {
+	// Attempts to retrieve a value from an array, resorting to default if it does not exist
+	return array_key_exists($key, $array) ? $array[$key]: $default;
+	}
+
+function create_buttons($classes) {
+	// Automatically creates button styles
+	$styles = "";
+	foreach ($classes as $name => $options) {
+		$primary = getFromArray($options, "primary", "black");
+		$secondary = getFromArray($options, "secondary", "white");
+		$styles .= ".$name {
+			color: $primary;
+			border-color: $primary;
+			background: $secondary;
+			}
+			.$name:hover {
+				color: $secondary;
+				background: $primary;
+				}
+			.$name:focus, .$name:active:focus {
+				outline-color: $primary;
+				}
+		";
+		}
+	echo $styles;
+	}
+
 ?>
