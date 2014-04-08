@@ -30,12 +30,12 @@ require "functions.php";
 					<h3 class = "center opt-page-title">Cellspace</h3>
 					<br/>
 					<h4 class = "center">Width: <script type = "text/javascript"> addHint(DATA.options.width); </script></h4>
-					<input type = "number" class = "fixed-input form-control" id = "options-cellspace-width" min = "1" value = "10"/>
+					<input type = "number" class = "ca-opt fixed-input form-control" name = "width" id = "options-cellspace-width" min = "1" value = "10"/>
 					<br/>
 					<h4 class = "center">Height: <script type = "text/javascript"> addHint(DATA.options.height); </script></h4>
-					<input type = "number" class = "fixed-input form-control" id = "options-cellspace-height" min = "1" value = "1"/>
+					<input type = "number" class = "ca-opt fixed-input form-control" name = "height" id = "options-cellspace-height" min = "1" value = "1"/>
 				</div>
-				<div class = " center options-page" id = "options-page-neighborhood" style = "display: none;">
+				<div class = "center options-page" id = "options-page-neighborhood" style = "display: none;">
 					<h3 class = "center opt-page-title">Cell Neighborhood</h3>
 					<br/>
 					<input type = "number" class = "fixed-input form-control" id = "options-neighborhood-size"/>
@@ -43,19 +43,29 @@ require "functions.php";
 				<div class = "center options-page" id = "options-page-interest" style = "display: none;">
 					<h3 class = "center opt-page title">Cell of Interest <script type = "text/javascript"> addHint(DATA.options.interest); </script></h3>
 					<br/>
+					<div class = "center" id = "options-interest-grid">
+					</div>
 					<script type = "text/javascript">
 						// Have to add this in dynamically, not on the load (or it won't change based on the height
 						// An easy way to do this might be to write to a div, not to the whole page (so it doesn't all get erased)
-						var cellspace_height = getElem('options-cellspace-height').value;
-						var ca_grid = new CAGrid(3, (cellspace_height == 1) ? 1: 3, "ca-cell-button");
-						ca_grid.draw();
+						function drawInterestGrid() {
+							getElem('options-interest-grid').innerHTML = '';
+							var cellspace_height = getElem('options-cellspace-height').value;
+							window.ca_interest_grid = new CAGrid(3, (cellspace_height == 1) ? 1: 3, "ca-cell-button");
+							ca_interest_grid.draw('options-interest-grid');
+							};
 					</script>
+				</div>
+				<div class = "center options-page" id = "options-page-rules" style = "display: none;">
+					<h3 class = "center opt-page title">Rules <script type = "text/javascript"> addHint(DATA.options.rules); </script></h3>
+					<br/>
+
 				</div>
 			</div>
 			<br/>
-			<button class = "btn btn-previous" onclick = "moveSlide(pages, -1);" id = "opt-prev-button" style = "float: left;"><i class = "iconfont-20 ionicons ion-arrow-left-a"></i> Previous
+			<button class = "btn btn-previous" onclick = "pages.move(-1);" id = "opt-prev-button" style = "float: left;"><i class = "iconfont-20 ionicons ion-arrow-left-a"></i> Previous
 			</button>
-			<button class = "btn btn-next" onclick = "moveSlide(pages, 1);" id = "opt-next-button" style = "float: right;">Next
+			<button class = "btn btn-next" onclick = "pages.move(1);" id = "opt-next-button" style = "float: right;">Next
 			<i class = "iconfont-20 ionicons ion-arrow-right-a"></i>
 			</button>
 			<br/><br/>
@@ -66,13 +76,11 @@ require "functions.php";
 					cellspace: function() {
 						getElem("options-cellspace-width").max = jQuery(window).width();
 						getElem("options-cellspace-height").max = jQuery(window).height();
-						return true;
 						},
 					neighborhood: function() {
-						return true;
 						},
 					interest: function() {
-						return true;
+						drawInterestGrid();
 						},
 					};
 

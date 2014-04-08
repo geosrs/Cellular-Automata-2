@@ -24,6 +24,21 @@ function Slides(ids, next, prev) {
 			// Adds an id to the list
 			return (typeof ids == "string") ? this.slides.push(ids): this.slides.extend(ids);
 			},
+		move: function(delta) {
+			// Moves the slides by "delta" amount
+			var current = this.active;
+			var new_slide = (current + delta);
+			var length = this.slides.length;
+			getElem(this.prev).disabled = (new_slide == 0);
+			getElem(this.next).disabled = (new_slide == length - 1);
+			var new_id = this.slides.get(new_slide % length);
+			jQuery(getElem(this.slides.get(current).elem)).slideUp(250, function() {
+				jQuery(getElem(new_id.elem)).slideDown(250);
+				});
+			new_id.initialize();
+			this.active = new_slide;
+			return new_slide;
+			},
 		};
 	getElem(prev).disabled = true;
 	return slides;
@@ -32,27 +47,32 @@ function Slides(ids, next, prev) {
 function CAGrid(width, height, css_class) {
 	// Creates a CAGrid object
 	var grid = {
+		hash: Date.now().toString(36),
 		width: width,
 		height: height,
 		css_class: css_class,
-		elements: [],
-		draw: function() {
-			// Draws the elements to the document
+		elements: new Array(),
+		draw: function(id) {
+			// Draws the elements to the document (or id's innerHTML)
+			var elem = document.getElementById(id);
+			var writeText = (exists(id) && exists(elem)) ? function(text) {elem.innerHTML += text;}: function(text) {document.write(text);}
 			for (var h = 0; h < this.height; h ++) {
 				for (var w = 1; w <= this.width; w ++) {
-					var id = 'button-grid-object-' + this.css_class + '-' + ((h * this.width) + w);
-					document.write('<button class = "{class}" id = {id} onclick = "ca_button_click(this);" buttonclicked="false"></button>'.replace('{id}', id).replace('{class}', this.css_class));
+					var name = ((h * this.width) + w);
+					var id = ["button", "grid", "object", this.hash, this.css_class, name].join("-");
+					writeText(['<button class = ', this.css_class, ' id = ', id, ' name = ',  name, ' onclick = "ca_button_click(this);" buttonclicked="false"></button>'].join(""));
 					this.elements.push(document.getElementById(id));
 					}
-				document.write('<br/>');
+				writeText('<br/>');
 				}
 			},
 		clicked: function() {
 			// Gets the clicked items
-			return this.elements.filter(
+			var clicked_elems = this.elements.filter(
 				function(elem, index, elem_array) {
 					return elem.getAttribute('buttonclicked') == "true";
 				});
+			return clicked_elems.map(function(elem) {return parseInt(elem.name);});
 			},
 		};
 	return grid;
@@ -62,7 +82,7 @@ function CAGrid(width, height, css_class) {
 
 function ca_button_click(elem) {
 		// "Clicks" the element
-		elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false")
+		elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false");
 		}
 
 function add_elements(page) {
@@ -120,29 +140,6 @@ function slideOptions(id) {
 	return menu.style.left;
 	}
 
-function showGrouping(id) {
-	// Shows the grouping
-	var slided = slideDiv(id);
-	var arrow = getElem(id + "-icon");
-	arrow.className = slided ? ICONS.up: ICONS.down;
-	}
-
-function moveSlide(elements, delta) {
-	// Shows the next slide
-	var current = elements.active;
-	var new_slide = (current + delta);
-	var length = elements.slides.length ;
-	getElem(elements.prev).disabled = (new_slide == 0);
-	getElem(elements.next).disabled = (new_slide == length - 1);
-	var new_id = elements.slides.get(new_slide % length);
-	jQuery(getElem(elements.slides.get(current).elem)).slideUp(250, function() {
-		jQuery(getElem(new_id.elem)).slideDown(250);
-		});
-	new_id.initialize();
-	elements.active = new_slide;
-	return new_slide;
-	}
-
 function addHint(text) {
 	// Adds a hint around an icon
 	document.write('<span class = "hint--rounded hint--top" data-hint = "' + text + '">\
@@ -156,24 +153,21 @@ function getElem(id) {
 
 function getOptions() {
 	// Gets the user's options
-	var options = {};
-	var elements = document.getElementsByClassName("ca-opt");
-	for (var index in elements) {
-		var element = elements[index];
-		options[element.name] = element.value;
-		}
+	var options = {
+		interest: ca_interest_grid.clicked(),
+		};
+	var elements = [].slice.call(document.getElementsByClassName('ca-opt'));
+	elements.forEach(
+		function(element, index, array) {
+			options[(element.name != "") ? element.name: element.id] = element.value;
+		});
 	return options;
 	}
 
 function drawCA() {
 	// Draws the Cellular Automata
 	var options = getOptions();
-	}
-
-function replaceAll(string, substring, repl) {
-	// Replaces all occurences of the substring with repl in string
-	var re = new RegExp(substring, 'g');
-	return string.replace(re, repl);
+	console.log(options);
 	}
 	
 Array.prototype.get = function(index) {
@@ -201,6 +195,12 @@ String.prototype.repeat = function(n) {
 	return new Array(n + 1).join(this);
 	}
 	
+String.prototype.replaceAll = function(substring, repl) {
+	// Replaces "substring" with "repl" for all occurences of substring
+	var pattern = new RegExp(substring, "g");
+	return this.replace(pattern, repl);
+	}
+
 function copy(from, to) {
 	// Copies the attributes in "from" and "to"
 	for (var key in from) {
@@ -214,6 +214,16 @@ function copy(from, to) {
 function hex(n) {
 	// Returns the hex representation of decimal n
 	return Number(n).toString(16);
+	}
+
+function int(n) {
+	// Extracts the integer number from n
+	return parseInt(n.match(/\d+/)[0]);
+	}
+
+function float(n) {
+	// Extracts a floating-pont number from n
+	return parseFloat(n.match(/[0-9.]+\.[0-9]+/)[0]);
 	}
 
 function is_null(x) {

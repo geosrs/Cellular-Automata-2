@@ -99,6 +99,7 @@ body {
 	left: 0;
 	opacity: 0.6;
 	padding: 20px;
+	border-right: 1px solid;
 	}
 
 .options-sidebar:hover {
