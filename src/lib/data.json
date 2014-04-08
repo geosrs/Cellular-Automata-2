@@ -1,4 +1,10 @@
 {
 	title: "Cellular Automata Project",
 	authors: ["Rushy Panchal", "George Georges", "Krish Pamani", "Naomi Popkin", "Allan Lee"],
+	options: {
+		width: "This is the width (in rows) of the Cellular Automata grid",
+		height: "This is the height (in columns) of the Cellular Automata grid --- set the height to 1 for 1-dimensional Cellular Automata",
+		interest: "This is the cell of interest. If a rule matches a pattern, this cell's state is turned on."
+		},
+	about: "",
 }

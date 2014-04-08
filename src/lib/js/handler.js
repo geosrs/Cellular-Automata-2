@@ -25,10 +25,57 @@ function Slides(ids, next, prev) {
 			return (typeof ids == "string") ? this.slides.push(ids): this.slides.extend(ids);
 			},
 		};
+	getElem(prev).disabled = true;
 	return slides;
 	}
 
+function CAGrid(width, height, css_class) {
+	// Creates a CAGrid object
+	var grid = {
+		width: width,
+		height: height,
+		css_class: css_class,
+		elements: [],
+		draw: function() {
+			// Draws the elements to the document
+			for (var h = 0; h < this.height; h ++) {
+				for (var w = 1; w <= this.width; w ++) {
+					var id = 'button-grid-object-' + this.css_class + '-' + ((h * this.width) + w);
+					document.write('<button class = "{class}" id = {id} onclick = "ca_button_click(this);" buttonclicked="false"></button>'.replace('{id}', id).replace('{class}', this.css_class));
+					this.elements.push(document.getElementById(id));
+					}
+				document.write('<br/>');
+				}
+			},
+		clicked: function() {
+			// Gets the clicked items
+			return this.elements.filter(
+				function(elem, index, elem_array) {
+					return elem.getAttribute('buttonclicked') == "true";
+				});
+			},
+		};
+	return grid;
+	}
+
 // Functions
+
+function ca_button_click(elem) {
+		// "Clicks" the element
+		elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false")
+		}
+
+function add_elements(page) {
+	// Adds the element to the title
+	document.title = DATA.title;
+	if (page == "index") {
+		}
+	else if (page == "start") {
+		}
+	else if (page == "automata") {
+		}
+	return true;
+	}
 
 function httpGet(url) {
 	// Gets data from a url
@@ -66,6 +113,13 @@ function slideDiv(id) {
 	return !divElemOn;
 	}
 	
+function slideOptions(id) {
+	// Slides the options menu
+	var menu = getElem(id);
+	menu.style.left = (parseInt(menu.style.left) < 0) ? 0: -400;
+	return menu.style.left;
+	}
+
 function showGrouping(id) {
 	// Shows the grouping
 	var slided = slideDiv(id);

@@ -17,5 +17,6 @@ require "functions.php";
 			<!-- Content goes here -->
 		</div>
 	</body>
+	<script type = "text/javascript"> add_elements("index"); </script>
 	<?php get_element("footer"); ?>
 </html>

@@ -1,0 +1,73 @@
+<html>
+	<style>
+		.ca-cell-button {
+			content: '';
+			background: white;
+			border: 2px solid;
+			border-color: black;
+			outline-color: transparent;
+			box-shadow: 0px;
+			width: 50px;
+			height: 50px;
+			padding: 0px;
+			transition: all 0.5s ease;
+			}
+		.ca-cell-button:hover	{
+			transform: scale(1.25, 1.25);
+			-webkit-transform: scale(1.25, 1.25);
+			-moz-transform: scale(1.25, 1.25);
+			-o-transform: scale(1.25, 1.25);
+			}
+
+		.ca-cell-button[buttonclicked="true"] {
+			background: orange;
+			}
+		.ca-cell-button[buttonclicked="true"]:hover {
+			transform: scale(0.8, 0.8);
+			-webkit-transform: scale(0.8, 0.8);
+			-moz-transform: scale(0.8, 0.8);
+			-o-transform: scale(0.8, 0.8);
+			}
+
+	</style>
+	<script>
+	function ca_button_click(elem) {
+		// "Clicks" the element
+		elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false")
+		}
+
+	function CAGrid(width, height, css_class) {
+		// Creates a CAGrid object
+		var grid = {
+			width: width,
+			height: height,
+			css_class: css_class,
+			elements: [],
+			draw: function() {
+				// Draws the elements to the document
+				for (var h = 1; h <= this.height; h ++) {
+					for (var w = 1; w <= this.width; w ++) {
+						var id = 'button-grid-object-' + this.css_class + '-(' + w + ',' + h + ')';
+						document.write('<button class = "{class}" id = {id} onclick = "ca_button_click(this);" buttonclicked="false"></button>'.replace('{id}', id).replace('{class}', this.css_class));
+						this.elements.push(document.getElementById(id));
+						}
+					document.write('<br/>');
+					}
+				},
+			clicked: function() {
+				// Gets the clicked items
+				return this.elements.filter(
+					function(elem, index, elem_array) {
+						return elem.getAttribute('buttonclicked') == "true";
+					});
+				},
+			};
+		return grid;
+		}
+	</script>
+	<body>
+		<script type = "text/javascript">
+			var grid = new CAGrid(10, 5, "ca-cell-button");
+			grid.draw();
+		</script>	</body>
+</html>

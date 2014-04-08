@@ -79,13 +79,11 @@ function create_buttons($classes) {
 			color: $primary;
 			border-color: $primary;
 			background: $secondary;
+			outline-color: $primary;
 			}
 			.$name:hover {
 				color: $secondary;
 				background: $primary;
-				}
-			.$name:focus, .$name:active:focus {
-				outline-color: $primary;
 				}
 		";
 		}

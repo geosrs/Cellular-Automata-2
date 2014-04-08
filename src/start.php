@@ -57,5 +57,6 @@ require "functions.php";
 				}
 			}, 1);
 	</script>
+	<script type = "text/javascript"> add_elements("start"); </script>
 	<?php get_element("footer"); ?>
 </html>

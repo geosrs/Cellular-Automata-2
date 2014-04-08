@@ -20,7 +20,7 @@ body {
 	
 /* Class rules */
 
-.navbar-custom, .show-button, .hover-text-hidden, .options-sidebar {
+.navbar-custom, .show-button, .hover-text-hidden, .options-sidebar, .ca-cell-button, .ca-cell-button[buttonclicked="true"] {
 	transition: all 0.5s ease;
 	-webkit-transition: all 0.5s;
 	-moz-transition: all 0.5s;
@@ -31,6 +31,7 @@ body {
 	color: orange;
 	border-color: orange;
 	background: white;
+	outline-color: orange;
 	}
 
 .btn-custom:hover {
@@ -38,14 +39,11 @@ body {
 	background: orange;
 	}
 
-.btn-custom:focus, .btn-custom:active:focus {
-	outline-color: orange;
-	}
-
 .btn-custom-inverse, .btn-custom-inverse:focus {
 	color: white;
 	border-color: white;
 	background: orange;
+	outline-color: white;
 	}
 
 .btn-custom-inverse:hover {
@@ -53,15 +51,8 @@ body {
 	background: white;
 	}
 
-.btn-custom-inverse:focus, .btn-custom-inverse:active:focus {
-	outline-color: white;
-	}
-
 .navbar-custom {
 	opacity: 0.8 !important;
-	}
-
-.nav-button {
 	}
 
 .navbar-custom:hover {
@@ -120,6 +111,35 @@ body {
 
 .fixed-input {
 	width: 200px;
+	}
+
+.ca-cell-button {
+	content: '';
+	background: white;
+	border: 2px solid;
+	border-color: black;
+	outline-color: transparent;
+	box-shadow: 0px;
+	width: 50px;
+	height: 50px;
+	padding: 0px;
+	}
+.ca-cell-button:hover {
+	transform: scale(1.25, 1.25);
+	-webkit-transform: scale(1.25, 1.25);
+	-moz-transform: scale(1.25, 1.25);
+	-o-transform: scale(1.25, 1.25);
+	}
+
+.ca-cell-button[buttonclicked="true"] {
+	background: orange;
+	}
+	
+.ca-cell-button[buttonclicked="true"]:hover {
+	transform: scale(0.8, 0.8);
+	-webkit-transform: scale(0.8, 0.8);
+	-moz-transform: scale(0.8, 0.8);
+	-o-transform: scale(0.8, 0.8);
 	}
 
 /* ID-based rules */
