@@ -75,7 +75,7 @@ function create_buttons($classes) {
 	foreach ($classes as $name => $options) {
 		$primary = getFromArray($options, "primary", "black");
 		$secondary = getFromArray($options, "secondary", "white");
-		$styles .= ".$name {
+		$styles .= ".$name, .$name:focus {
 			color: $primary;
 			border-color: $primary;
 			background: $secondary;

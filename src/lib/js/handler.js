@@ -47,32 +47,46 @@ function Slides(ids, next, prev) {
 function CAGrid(width, height, css_class) {
 	// Creates a CAGrid object
 	var grid = {
-		hash: Date.now().toString(36),
+		hash: Date.now().toString(36).match(/[a-z]+/ig).join(""),
 		width: width,
 		height: height,
 		css_class: css_class,
+		base_id: ["button", "grid", "object", css_class].join("-"),
 		elements: new Array(),
-		draw: function(id) {
+		draw: function(id, start) {
 			// Draws the elements to the document (or id's innerHTML)
-			var elem = document.getElementById(id);
+			var elem = getElem(id);
 			var writeText = (exists(id) && exists(elem)) ? function(text) {elem.innerHTML += text;}: function(text) {document.write(text);}
 			for (var h = 0; h < this.height; h ++) {
 				for (var w = 1; w <= this.width; w ++) {
-					var name = ((h * this.width) + w);
-					var id = ["button", "grid", "object", this.hash, this.css_class, name].join("-");
-					writeText(['<button class = ', this.css_class, ' id = ', id, ' name = ',  name, ' onclick = "ca_button_click(this);" buttonclicked="false"></button>'].join(""));
-					this.elements.push(document.getElementById(id));
+					var name = this.hash + "-" + ((h * this.width) + w);
+					var buttonID = this.base_id + "-" + name;
+					writeText(['<button class = ', this.css_class, ' id = ', buttonID, ' name = ',  name, ' onclick = "ca_button_click(this);" buttonclicked="false"></button>'].join(""));
+					this.elements.push(buttonID);
 					}
 				writeText('<br/>');
 				}
+			for (var index in start) {
+				if (start.hasOwnProperty(index)) {
+					var buttonName = start[index];
+					document.getElementById(this.base_id + "-" + buttonName).setAttribute('buttonclicked', true);
+				}
+				}
 			},
-		clicked: function() {
+		clicked: function(raw) {
 			// Gets the clicked items
-			var clicked_elems = this.elements.filter(
+			var elements = new Array();
+			for (var index in this.elements) {
+				if (this.elements.hasOwnProperty(index)) {
+					elements.push(getElem(this.elements[index]));
+					}
+				}
+			var clicked_elems = elements.filter(
 				function(elem, index, elem_array) {
 					return elem.getAttribute('buttonclicked') == "true";
-				});
-			return clicked_elems.map(function(elem) {return parseInt(elem.name);});
+					});
+			var extract = (exists(raw) && raw) ? function(elem) {return elem.name;}: function(elem) {return int(elem.name)};
+			return clicked_elems.map(extract);
 			},
 		};
 	return grid;
@@ -95,6 +109,48 @@ function add_elements(page) {
 	else if (page == "automata") {
 		}
 	return true;
+	}
+	
+function slideOptions(id) {
+	// Slides the options menu
+	var menu = getElem(id);
+	menu.style.left = (parseInt(menu.style.left) < 0) ? 0: -400;
+	return menu.style.left;
+	}
+
+function addHint(text) {
+	// Adds a hint around an icon
+	document.write('<span class = "hint--rounded hint--top" data-hint = "' + text + '">\
+		<i class = "iconfont-20 ionicons ion-help-circled"></i></span>');
+	}
+
+function addNewRule(id) {
+	// Opens the rule interface
+	getElem(id).contentWindow.document.write("DIV HERE" + "<br/>");
+	}
+
+function getOptions() {
+	// Gets the user's options
+	var options = {
+		interest: exists(ca_interest_grid) ? ca_interest_grid.clicked(): [],
+		};
+	var elements = [].slice.call(document.getElementsByClassName('ca-opt'));
+	elements.forEach(
+		function(element, index, array) {
+			options[(element.name != "") ? element.name: element.id] = element.value;
+		});
+	return options;
+	}
+
+function drawCA() {
+	// Draws the Cellular Automata
+	var options = getOptions();
+	console.log(options);
+	}
+	
+function getElem(id) {
+	// Returns the element by its id
+	return document.getElementById(id);
 	}
 
 function httpGet(url) {
@@ -132,44 +188,7 @@ function slideDiv(id) {
 	divElemOn ? jQuery(divElem).slideUp(): jQuery(divElem).slideDown();
 	return !divElemOn;
 	}
-	
-function slideOptions(id) {
-	// Slides the options menu
-	var menu = getElem(id);
-	menu.style.left = (parseInt(menu.style.left) < 0) ? 0: -400;
-	return menu.style.left;
-	}
 
-function addHint(text) {
-	// Adds a hint around an icon
-	document.write('<span class = "hint--rounded hint--top" data-hint = "' + text + '">\
-		<i class = "iconfont-20 ionicons ion-help-circled"></i></span>');
-	}
-
-function getElem(id) {
-	// Returns the element by its id
-	return document.getElementById(id);
-	}
-
-function getOptions() {
-	// Gets the user's options
-	var options = {
-		interest: ca_interest_grid.clicked(),
-		};
-	var elements = [].slice.call(document.getElementsByClassName('ca-opt'));
-	elements.forEach(
-		function(element, index, array) {
-			options[(element.name != "") ? element.name: element.id] = element.value;
-		});
-	return options;
-	}
-
-function drawCA() {
-	// Draws the Cellular Automata
-	var options = getOptions();
-	console.log(options);
-	}
-	
 Array.prototype.get = function(index) {
 	// Allows for index wrapping
 	var length = this.length;

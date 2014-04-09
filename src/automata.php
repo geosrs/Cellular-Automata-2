@@ -46,20 +46,24 @@ require "functions.php";
 					<div class = "center" id = "options-interest-grid">
 					</div>
 					<script type = "text/javascript">
-						// Have to add this in dynamically, not on the load (or it won't change based on the height
-						// An easy way to do this might be to write to a div, not to the whole page (so it doesn't all get erased)
+						// need to preserve previous input (maybe have a way to dynamically turn on cells)
+						// or maybe edit the height if the height changes
 						function drawInterestGrid() {
 							getElem('options-interest-grid').innerHTML = '';
 							var cellspace_height = getElem('options-cellspace-height').value;
 							window.ca_interest_grid = new CAGrid(3, (cellspace_height == 1) ? 1: 3, "ca-cell-button");
-							ca_interest_grid.draw('options-interest-grid');
+							ca_interest_grid.draw('options-interest-grid', ca_interest_grid.clicked(true));
 							};
+						drawInterestGrid();
 					</script>
 				</div>
 				<div class = "center options-page" id = "options-page-rules" style = "display: none;">
 					<h3 class = "center opt-page title">Rules <script type = "text/javascript"> addHint(DATA.options.rules); </script></h3>
 					<br/>
-
+					<button class = "center btn btn-custom" id = "options-new-rule" onclick = "addNewRule('options-rules');">Add Rule</button>
+					<br/><br/>
+					<iframe id = 'options-rules' class = "center" frameborder = "0" seamless>
+					</iframe>
 				</div>
 			</div>
 			<br/>
@@ -80,7 +84,9 @@ require "functions.php";
 					neighborhood: function() {
 						},
 					interest: function() {
-						drawInterestGrid();
+						},
+					rules: function() {
+						document.maxCAHeight = getElem("options-cellspace-height").value;
 						},
 					};
 
@@ -88,6 +94,7 @@ require "functions.php";
 					{elem: "options-page-cellspace", initialize: pageInits.cellspace},
 					// {elem: "options-page-neighborhood", initialize: pageInits.neighborhood},
 					{elem: "options-page-interest", initialize: pageInits.interest},
+					{elem: "options-page-rules", initialize: pageInits.rules},
 					], "opt-next-button", "opt-prev-button");
 			</script>
 		</div>

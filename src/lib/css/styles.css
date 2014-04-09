@@ -27,7 +27,7 @@ body {
 	-o-transition: all 0.5s;
 	}
 
-.btn-custom {
+.btn-custom, .btn-custom:focus {
 	color: orange;
 	border-color: orange;
 	background: white;
@@ -39,7 +39,7 @@ body {
 	background: orange;
 	}
 
-.btn-custom-inverse, .btn-custom-inverse:focus {
+.btn-custom-inverse,  .btn-custom-inverse:focus {
 	color: white;
 	border-color: white;
 	background: orange;
