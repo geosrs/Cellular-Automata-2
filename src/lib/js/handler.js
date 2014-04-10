@@ -139,6 +139,8 @@ function getOptions() {
 		function(element, index, array) {
 			options[(element.name != "") ? element.name: element.id] = element.value;
 		});
+	options.dimension = (options.height == 1) ? 1: 2;
+	window.options = options;
 	return options;
 	}
 

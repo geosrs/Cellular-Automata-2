@@ -33,7 +33,7 @@ require "functions.php";
 					<input type = "number" class = "ca-opt fixed-input form-control" name = "width" id = "options-cellspace-width" min = "1" value = "10"/>
 					<br/>
 					<h4 class = "center">Height: <script type = "text/javascript"> addHint(DATA.options.height); </script></h4>
-					<input type = "number" class = "ca-opt fixed-input form-control" name = "height" id = "options-cellspace-height" min = "1" value = "1"/>
+					<input type = "number" class = "ca-opt fixed-input form-control" name = "height" id = "options-cellspace-height" min = "1" value = "1" onchange = "window.options.dimension = this.height;"/>
 				</div>
 				<div class = "center options-page" id = "options-page-neighborhood" style = "display: none;">
 					<h3 class = "center opt-page-title">Cell Neighborhood</h3>
@@ -43,26 +43,33 @@ require "functions.php";
 				<div class = "center options-page" id = "options-page-interest" style = "display: none;">
 					<h3 class = "center opt-page title">Cell of Interest <script type = "text/javascript"> addHint(DATA.options.interest); </script></h3>
 					<br/>
-					<div class = "center" id = "options-interest-grid">
-					</div>
+					<div class = "center" id = "options-interest-grid"></div>
 					<script type = "text/javascript">
-						// need to preserve previous input (maybe have a way to dynamically turn on cells)
-						// or maybe edit the height if the height changes
+						/* need to preserve previous input (maybe have a way to dynamically turn on cells)
+						or maybe edit the height if the height changes
+						- a universal way to handle the options (global document.variable?) would be useful for this
+						- then, change the dimension option (window.options.dimension) when the height is changed
+						- will also have to update this dimension variable for the CAGrid objects (maybe on load change them, or just create a new grid)
+						*/
+						var cellspace_height = options.height;
+						window.options.dimension = (cellspace_height == 1) ? 1: 3;
 						function drawInterestGrid() {
-							getElem('options-interest-grid').innerHTML = '';
-							var cellspace_height = getElem('options-cellspace-height').value;
-							window.ca_interest_grid = new CAGrid(3, (cellspace_height == 1) ? 1: 3, "ca-cell-button");
-							ca_interest_grid.draw('options-interest-grid', ca_interest_grid.clicked(true));
-							};
+							// Draws the interest grid
+							if (!exists(ca_interest_grid) || ca_interest_grid.height != cellspace_height) {
+								getElem('options-interest-grid').innerHTML = '';
+								window.ca_interest_grid = new CAGrid(3, options.dimension, "ca-cell-button");
+								ca_interest_grid.draw('options-interest-grid', ca_interest_grid.clicked(true));
+								}
+							}
 						drawInterestGrid();
 					</script>
 				</div>
 				<div class = "center options-page" id = "options-page-rules" style = "display: none;">
 					<h3 class = "center opt-page title">Rules <script type = "text/javascript"> addHint(DATA.options.rules); </script></h3>
 					<br/>
-					<button class = "center btn btn-custom" id = "options-new-rule" onclick = "addNewRule('options-rules');">Add Rule</button>
+					<button class = "center btn btn-custom" id = "options-new-rule" onclick = "addNewRule('options-rules-list');">Add Rule</button>
 					<br/><br/>
-					<iframe id = 'options-rules' class = "center" frameborder = "0" seamless>
+					<iframe id = 'options-rules-list' class = "center" frameborder = "0" seamless>
 					</iframe>
 				</div>
 			</div>
@@ -86,10 +93,10 @@ require "functions.php";
 					interest: function() {
 						},
 					rules: function() {
-						document.maxCAHeight = getElem("options-cellspace-height").value;
+						document.options.height = getElem("options-cellspace-height").value;
 						},
 					};
-
+					
 				var pages = new Slides([
 					{elem: "options-page-cellspace", initialize: pageInits.cellspace},
 					// {elem: "options-page-neighborhood", initialize: pageInits.neighborhood},

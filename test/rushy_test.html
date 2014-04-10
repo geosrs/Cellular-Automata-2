@@ -2,6 +2,8 @@
 	<head>
 		<script type = "text/javascript" src = "../src/lib/js/handler.js"></script>
 		<script type = "text/javascript" src = "../src/lib/js/graphics.js"></script>
+		<script type = "text/javascript" src = "../src/lib/js/jquery.min.js"></script>
+		<link rel = "stylesheet" type = "text/css" href = "../src/lib/css/bootstrap.min.css"></link>
 	</head>
 	<style>
 		.ca-cell-button {
@@ -32,15 +34,52 @@
 			-moz-transform: scale(0.8, 0.8);
 			-o-transform: scale(0.8, 0.8);
 			}
-
+		.ca-opt-rule-small {
+			text-align: center;
+			vertical-align: middle;
+			background: white;
+			color: orange;
+			outline-color: orange;
+			border-color: orange;
+			}
+		.ca-opt-rule-small:focus {
+			color: orange;
+			}
+		.ca-opt-rule-small:hover {
+			background: orange;
+			color: white;
+			}
+		.ca-rule-canvas {
+			width: 18px;
+			height: 18px;
+			}
 	</style>
 	<body>
-		<div id = "derp">
-			derp
-		</div>
 		<script type = "text/javascript">
-			var grid = new CAGrid(10, 5, "ca-cell-button");
-			grid.draw('derp');
+			function saveRule(grid, id) {
+				var graph = new GraphWin(id);
+				var clicked = grid.clicked();
+				graph.clear();
+				graph.setColor('orange');
+				for (var index in clicked) {
+					if (clicked.hasOwnProperty(index)) {
+						var pt = clicked[index];
+						graph.plot(pt, 2);
+						}
+					}
+				}
 		</script>
+		<!-- Small display -->
+		<button class = "ca-opt-rule-small btn" id = "ca-rule-1-small" onclick = "slideDiv('ca-rule-1-large');">
+			Rule <span id = "ca-rule-1-num">1</span> <canvas class = "ca-rule-canvas" id = "ca-rule-1-canvas"></canvas> <span class = "ca-rule-edit-label">Edit</span>
+		</button>
+		<div class = "center ca-opt-rule-large" id = "ca-rule-1-large" style = "display: none;">
+			<script type = "text/javascript">
+				var ca_grid_rule_1 = new CAGrid(3, 3, "ca-cell-button"); // has to be 3, 1 for 1 dimensional CA
+				// Also, need to prevent user from editing the cell of interest
+				ca_grid_rule_1.draw();
+			</script>
+			<button class = "btn btn-custom" onclick = "saveRule(ca_grid_rule_1, 'ca-rule-1-canvas');">Save</button>
+		</div>
 	</body>
 </html>
