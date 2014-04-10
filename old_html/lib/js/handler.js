@@ -5,12 +5,32 @@ handler.js --- handles various event calls
 
 // Constants
 
+window.options = {
+	interest: [2],
+	dimension: 1,
+	height: 1,
+	width: 10,
+	rules: [],
+	}
+
 var ICONS = {
 	loading: "iconfont-20 ionicons ion-loading-c",
 	down: "iconfont-40 ionicons ion-ios7-arrow-down",
 	up: "iconfont-40 ionicons ion-ios7-arrow-up"
 	}
 	
+var BASE_RULE = '<button class = "ca-opt-rule-small btn-custom btn" id = "ca-rule-1-small" onclick = "slideDiv(' + "'ca-rule-1-large'" + '");">\
+			Rule {number} <canvas class = "ca-rule-canvas" id = "ca-rule-{number}-canvas"></canvas> <span class = "ca-rule-edit-label">Edit</span>\
+		</button>\
+		<div class = "center ca-opt-rule-large" id = "ca-rule-{number}-large" style = "display: none;">\
+			<script type = "text/javascript">\
+				var ca_grid_rule_{number} = new CAGrid(3, 3, "ca-cell-button"); // has to be 3, 1 for 1 dimensional CA\
+				// Also, need to prevent user from editing the cell of interest\
+				ca_grid_rule_{number}.draw();\
+			</script>\
+			<button class = "btn btn-custom" onclick = "saveRule(ca_grid_rule_{number}, ' + "'ca-rule-1-canvas'" + '");">Save</button>\
+		</div>';
+
 // Classes
 
 function Slides(ids, next, prev) {
@@ -95,9 +115,9 @@ function CAGrid(width, height, css_class) {
 // Functions
 
 function ca_button_click(elem) {
-		// "Clicks" the element
-		elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false");
-		}
+	// "Clicks" the element
+	elem.setAttribute('buttonclicked', elem.getAttribute('buttonclicked') == "false");
+	}
 
 function add_elements(page) {
 	// Adds the element to the title
@@ -126,21 +146,31 @@ function addHint(text) {
 
 function addNewRule(id) {
 	// Opens the rule interface
-	getElem(id).contentWindow.document.write("DIV HERE" + "<br/>");
+	var options = window.options;
+	var rule_number = options.rules.length + 1;
+	var rule_string = BASE_RULE.replaceAll('{number}', rule_number);
+	options.rules.push(rule_number);
+	getElem(id).contentWindow.document.write(rule_string);
+	}
+
+function setDimensions() {
+	// Sets the dimensions of the options
+	var options = window.options;
+	options.height = getElem("options-cellspace-height").value;
+	options.dimension = (options.height == 1) ? 1: 2;
+	return options.dimension;
 	}
 
 function getOptions() {
 	// Gets the user's options
-	var options = {
-		interest: exists(ca_interest_grid) ? ca_interest_grid.clicked(): [],
-		};
+	var options = window.options;
+	options.interest = exists(ca_interest_grid) ? ca_interest_grid.clicked(): [];
 	var elements = [].slice.call(document.getElementsByClassName('ca-opt'));
 	elements.forEach(
 		function(element, index, array) {
 			options[(element.name != "") ? element.name: element.id] = element.value;
 		});
-	options.dimension = (options.height == 1) ? 1: 2;
-	window.options = options;
+	setDimensions();
 	return options;
 	}
 

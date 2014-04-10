@@ -52,16 +52,16 @@ require "functions.php";
 						- will also have to update this dimension variable for the CAGrid objects (maybe on load change them, or just create a new grid)
 						*/
 						var cellspace_height = options.height;
-						window.options.dimension = (cellspace_height == 1) ? 1: 3;
-						function drawInterestGrid() {
+						setDimensions();
+						function drawInterestGrid(grid) {
 							// Draws the interest grid
-							if (!exists(ca_interest_grid) || ca_interest_grid.height != cellspace_height) {
+							if (is_null(grid) || ca_interest_grid.height != cellspace_height) {
 								getElem('options-interest-grid').innerHTML = '';
 								window.ca_interest_grid = new CAGrid(3, options.dimension, "ca-cell-button");
 								ca_interest_grid.draw('options-interest-grid', ca_interest_grid.clicked(true));
 								}
 							}
-						drawInterestGrid();
+						drawInterestGrid(null);
 					</script>
 				</div>
 				<div class = "center options-page" id = "options-page-rules" style = "display: none;">
@@ -69,8 +69,7 @@ require "functions.php";
 					<br/>
 					<button class = "center btn btn-custom" id = "options-new-rule" onclick = "addNewRule('options-rules-list');">Add Rule</button>
 					<br/><br/>
-					<iframe id = 'options-rules-list' class = "center" frameborder = "0" seamless>
-					</iframe>
+					<iframe id = 'options-rules-list' class = "center" frameborder = "0" seamless></iframe>
 				</div>
 			</div>
 			<br/>
@@ -93,7 +92,7 @@ require "functions.php";
 					interest: function() {
 						},
 					rules: function() {
-						document.options.height = getElem("options-cellspace-height").value;
+						setDimensions();
 						},
 					};
 					

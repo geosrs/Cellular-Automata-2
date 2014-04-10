@@ -143,6 +143,16 @@ body {
 	-o-transform: scale(0.8, 0.8);
 	}
 
+.ca-opt-rule-small {
+	text-align: center;
+	vertical-align: middle;
+	}
+	
+.ca-rule-canvas {
+	width: 18px;
+	height: 18px;
+	}
+
 /* ID-based rules */
 
 #footer {
