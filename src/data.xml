@@ -2,8 +2,15 @@
 	<!-- Any changes here will carry throughout the entire project -->
 	<title>Cellular Automata Project</title>
 	<authors>Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee</authors>
-	<copyright>Copyright 2014</copyright>
+	<copyright>Copyright Rushy Panchal et al. 2014</copyright>
 	<about>
 		<!-- About Text Goes Here -->
 	</about>
+	<options>
+		<width>This is the width (in rows) of the Cellular Automata grid.</width>
+		<height>This is the height (in columns) of the Cellular Automata grid.
+		Set it to 1 for 1-Dimensional Automata.</height>
+		<interest>This cell, the cell of interest, is turned on if a rule matches a pattern.</interest>
+		<rules>The Cellular Automata rules dictate which cells to turn on. If any pattern is matched for a specified Cell of Interest, then that cell is turned on.</rules>
+	</options>
 </data>
