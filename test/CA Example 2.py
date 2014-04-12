@@ -8,36 +8,68 @@ import copy
 import time
 
 def main():
-    ca = GraphWin("Cellular Automata", 401, 401, autoflush = False)
-    ca.setBackground("white") # white background saves computational power (off cells are white and do not need to be plotted)
-    ca.setCoords(0, 0, 400, 400)
-    cs = [[0 for i in range(401)] for j in range(401)]
-    cs[200][200] = 1 # center cell is on
-    genca2(ca, cs)
+	# ca = GraphWin("Cellular Automata", 401, 401, autoflush = False)
+	# to run with Tkinter:
+	ca = GraphWin(None, 401, 401, autoflush = False)
+	ca.grid()
+	ca.setBackground("white") # white background saves computational power (off cells are white and do not need to be plotted)
+	ca.setCoords(0, 0, 400, 400)
+	cs = [[0 for i in range(401)] for j in range(401)]
+	cs[200][200] = 1 # center cell is on
+	genca2_optimize(ca, cs)
 
 def genca2(window, cs):
-    y = 399
-    ymax = 399
-    xmin = 1
-    x = 1
-    ymin = 1
-    xmax = 399
-    step = 1
-    for m in range(195):
-        newcellspace = [[0 for i in range(401)] for j in range(401)]
-        window.clear()
-        while y >= ymin: # starts from the top of the cell space and works down
-            x = xmin
-            while x <= xmax: # moves across each row
-                if 1 <= cs[x-1][y-1] + cs[x][y-1] + cs[x-1][y] + cs[x][y] + cs[x+1][y] + cs[x][y+1] + cs[x+1][y+1] + cs[x+1][y-1] + cs[x-1][y+1] <= 4:
-                    window.plot(x, y, "black")
-                    newcellspace[x][y] = 1
-                x += step
-            y -= step
-        cs = copy.deepcopy(newcellspace) # copies the 2D array
-        y = ymax
-        #window.update()
-        print(m)
+	y = 399
+	ymax = 399
+	xmin = 1
+	x = 1
+	ymin = 1
+	xmax = 399
+	step = 1
+	for m in range(195):
+		newcellspace = [[0 for i in range(401)] for j in range(401)]
+		window.clear()
+		while y >= ymin: # starts from the top of the cell space and works down
+			x = xmin
+			while x <= xmax: # moves across each row
+				if 1 <= cs[x-1][y-1] + cs[x][y-1] + cs[x-1][y] + cs[x][y] + cs[x+1][y] + cs[x][y+1] + cs[x+1][y+1] + cs[x+1][y-1] + cs[x-1][y+1] <= 4:
+					window.plot(x, y, "black")
+					newcellspace[x][y] = 1
+				x += step
+			y -= step
+		cs = copy.deepcopy(newcellspace) # copies the 2D array
+		y = ymax
+		window.update()
+		print(m)
 
+def genca2_optimize(window, cs):
+	y = 399
+	ymax = 399
+	xmin = 1
+	x = 1
+	ymin = 1
+	xmax = 399
+	step = 1
+	for m in range(195):
+		newcellspace = [[0 for i in range(401)] for j in range(401)]
+		to_plot = []
+		# window.clear()
+		while y >= ymin: # starts from the top of the cell space and works down
+			x = xmin
+			while x <= xmax: # moves across each row
+				if 1 <= cs[x-1][y-1] + cs[x][y-1] + cs[x-1][y] + cs[x][y] + cs[x+1][y] + cs[x][y+1] + cs[x+1][y+1] + cs[x+1][y-1] + cs[x-1][y+1] <= 4:
+					# window.plot(x, y, "black")
+					to_plot.append([x, y])
+					newcellspace[x][y] = 1
+				x += step
+			y -= step
+		cs = copy.deepcopy(newcellspace) # copies the 2D array
+		y = ymax
+		window.clear()
+		for i, j in to_plot:
+			window.plot(i, j, "black")
+		window.update()
+		print(m)
+		
 if __name__ == "__main__":
-    main()
+	main()

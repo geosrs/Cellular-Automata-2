@@ -53,3 +53,9 @@ class CAScreen(tk.Frame):
 		self.master = master
 		self.WM = wm
 		tk.Frame.__init__(self, self.master)
+		self.createInterface()
+
+	def createInterface(self):
+		'''Creates the main interface for the CA interface'''
+		self.mainFrame = self
+		

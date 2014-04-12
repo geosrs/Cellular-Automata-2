@@ -13,6 +13,6 @@ def main():
 	tk.createBaseStyles(root)
 	app = App(root)
 	app.mainloop()
-	
+
 if __name__ == "__main__":
 	main()
