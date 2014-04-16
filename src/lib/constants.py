@@ -1,4 +1,4 @@
-# constants.py
+# lib.constants.py
 # Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
 # Cellular Automata Project
 # Contains the main constants
@@ -6,14 +6,13 @@
 ### Imports
 
 import xmlparse as xml
+import setup
 import json
 import os
 
-import setup
-
 ### Main constants
 
-SETUP_STATUS = setup.run()
+SETUP_STATUS = setup.run() # set up the program files
 
 CUR_DIR = os.getcwd()
 USER_DIR = os.path.join(CUR_DIR, "user")
@@ -32,7 +31,7 @@ HISTORY_PATH = os.path.join(DEFAULT_DIR, "history.json")
 DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.TEXT)
 
 with open(SETTINGS_PATH, 'r') as SETTINGS_FILE:
-	SETTINGS = json.load(SETTINGS_FILE)
+	SETTINGS = xml.Object(json.load(SETTINGS_FILE))
 with open(HISTORY_PATH, 'r') as HISTORY_FILE:	
 	HISTORY = json.load(HISTORY_FILE)
 
@@ -42,7 +41,7 @@ NAME = DATA.title.text
 AUTHORS = DATA.authors.text
 COPYRIGHT = DATA.copyright.text
 
-### Window-managing constants
+### Window-managing constants --- they identify the various windows
 
 START = 1
 MAIN_PROGRAM = 2
@@ -51,6 +50,25 @@ HELP = 4
 CREDITS = 5
 HISTORY = 6
 OPTIONS_SPACE = 7
+OPTIONS_INTEREST = 8
+OPTIONS_RULES =  9
+
+### User Options
+
+OPTIONS = xml.Object({
+	"width": 250,
+	"height": 250,
+	"dimension": 2,
+	"interest": [],
+	"rules": [],
+	})
+
+def setOption(key, value = None):
+	'''Sets the option "key" to "value"'''
+	global OPTIONS
+	value = value.get() if hasattr(value, 'get') else value
+	OPTIONS[key] = value
+	return value
 
 ### Miscellaneous Constants
 

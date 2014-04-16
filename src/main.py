@@ -11,10 +11,11 @@ from lib import *
 def main():
 	'''Main application process'''
 	root = tk.Tk()
-	tk.createBaseStyles(root)
+	initializeStyles(root)
 	app = App(root)
 	app.center()
 	app.mainloop()
 
 if __name__ == "__main__":
 	main()
+	

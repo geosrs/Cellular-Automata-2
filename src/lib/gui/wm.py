@@ -47,6 +47,8 @@ class WindowManager(object):
 			if not isinstance(window, tk.Frame): # create a new Frame object if it does not exist already
 				window = window(self.master, self)
 			window.grid(**self.grid_options) # show the new window
+			if hasattr(window, 'onload'):
+				window.onload()
 			self.current = window
 		return True
 		
