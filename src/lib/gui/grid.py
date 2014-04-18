@@ -19,10 +19,15 @@ class CAGrid(tk.BaseCustomWidget):
 		self.activeColor = tk.dictGet(options, "activeColor", "black")
 		self.hoverColor = tk.dictGet(options, "hoverColor", "blue")
 		self.outlineColor = tk.dictGet(options, "outlineColor", "black")
+		options["width"] = options["height"] = tk.dictGet(options, "size", 200)
 		self.graph = graph.GraphWin(self.mainFrame, **options)
 		self.graph.grid()
 		self.draw()
 	
+	def configure(self, *kw, **kwargs):
+		'''Configures the CAGrid'''
+		return self.graph.configure(*kw, **kwargs)
+
 	def draw(self, width = None, height = None):
 		'''Draws the grid'''
 		self.cells = []

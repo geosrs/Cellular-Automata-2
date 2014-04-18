@@ -41,8 +41,8 @@ class Screen(tk.Frame):
 		'''Adds the navigation buttons'''
 		nextCommand = options.get("nextCommand", lambda: self.setOptions())
 		prevCommand = options.get("prevCommand", lambda: self.setOptions())
-		self.nextButton = tk.Button(self, text = next, command = lambda: self.WM.open(self.next) + nextCommand())
-		self.prevButton = tk.Button(self, text = prev, command = lambda: self.WM.open(self.prev) + prevCommand())
+		self.nextButton = tk.Button(self, text = next, command = lambda: nextCommand() + self.WM.open(self.next))
+		self.prevButton = tk.Button(self, text = prev, command = lambda: prevCommand() + self.WM.open(self.prev))
 
 class StartScreen(Screen):
 	'''Start screen for the entire application'''
@@ -178,7 +178,9 @@ class Options_InterestScreen(Screen):
 		newHeight = 1 if OPTIONS.dimension == 1 else 3
 		if newHeight != self.caGrid.height:
 			# dimension changed --- create a new CAGrid
+			self.caGrid.configure(height = int(self.caGrid.configure("height")[-1]) * (1.0/3 if OPTIONS.dimension == 1 else 3))
 			self.caGrid.draw(3, newHeight)
+		return True
 
 class Options_RuleScreen(Screen):
 	'''Interface for user to add Celluar Automata rules'''
@@ -191,6 +193,7 @@ class Options_RuleScreen(Screen):
 		self.rules = {}
 		self.mainLabel = tk.Label(self, text = "Rules", style = "Subheader.TLabel")
 		self.ruleFrame = tk.Notebook(self)
+		self.ruleFrame.enable_traversal()
 		self.addRuleButton = tk.Button(self, text = "Add Rule", command = self.addRule)
 		self.addNavigator()
 
@@ -207,6 +210,7 @@ class Options_RuleScreen(Screen):
 		self.rules[self.currentRule] = newRuleFrame
 		ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = self.currentRule), style = "OptionHeader.TLabel")
 		ruleGrid = CAGrid(newRuleFrame, 3, 1 if OPTIONS.dimension == 1 else 3)
+		newRuleFrame.grid = ruleGrid
 
 		newRuleFrame.gridWidgets([
 			ruleLabel,
@@ -214,3 +218,26 @@ class Options_RuleScreen(Screen):
 			], pady = 5)
 		self.ruleFrame.add(newRuleFrame, text = str(self.currentRule).center(10))
 		self.currentRule += 1
+
+	def onload(self):
+		'''Changes the grid dimensions'''
+		newHeight = 1 if OPTIONS.dimension == 1 else 3
+		if not self.rules:
+			return False
+		if newHeight != self.rules.values()[-1].grid.height:
+			# dimension changed --- create a new CAGrid
+			for rule in self.rules.values():
+				grid = rule.grid
+				grid.configure(height = int(grid.configure("height")[-1]) * (1.0/3 if OPTIONS.dimension == 1 else 3))
+				grid.draw(3, newHeight)
+		return True
+
+	def setOptions(self):
+		'''Sets  the global options'''
+		rules = []
+		for rule_grid in self.rules.values():
+			rule_list = rule_grid.grid.clicked()
+			if rule_list:
+				rules.append(rule_list)
+		setOption("rules", rules)
+		return True
