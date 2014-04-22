@@ -14,7 +14,7 @@ BUILD_PATH = os.path.join(CUR_DIR, "src")
 # Files and extensions to include
 
 PACKAGES = ["tk"]
-MODULES = ['xmlparse']
+MODULES = ['xmlparse', "pysqlite"]
 
 def setup():
 	'''Sets up the files'''

@@ -6,6 +6,7 @@
 ### Imports
 
 import xmlparse as xml
+import pysqlite as sql
 import setup
 import json
 import os
@@ -21,19 +22,18 @@ DEFAULT_DIR = os.path.join(LIB_DIR, "defaults")
 
 DATA_PATH = os.path.join(LIB_DIR, "data.xml")
 SETTINGS_PATH = os.path.join(USER_DIR, "settings.json")
-HISTORY_PATH = os.path.join(USER_DIR, "history.json")
+DATABASE_PATH = os.path.join(USER_DIR, "rules.db")
 
 # Remove once testing is done
 SETTINGS_PATH = os.path.join(DEFAULT_DIR, "settings.json")
-HISTORY_PATH = os.path.join(DEFAULT_DIR, "history.json")
 
 # retrieve data from the various files
 DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.TEXT)
 
 with open(SETTINGS_PATH, 'r') as SETTINGS_FILE:
 	SETTINGS = xml.Object(json.load(SETTINGS_FILE))
-with open(HISTORY_PATH, 'r') as HISTORY_FILE:	
-	HISTORY = json.load(HISTORY_FILE)
+
+DATABASE = sql.Database(DATABASE_PATH)
 
 ### Supplementary constants
 
@@ -52,6 +52,8 @@ HISTORY = 6
 OPTIONS_SPACE = 7
 OPTIONS_INTEREST = 8
 OPTIONS_RULES =  9
+OPTIONS_CONFIRM = 10
+DRAW = 11
 
 ### User Options
 

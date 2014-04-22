@@ -6,6 +6,7 @@
 ### Imports
 
 import xmlparse as xml
+import pysqlite as sql
 import shutil
 import os
 
@@ -16,7 +17,9 @@ USER_DIR = os.path.join(CUR_DIR, "user")
 LIB_DIR = os.path.join(CUR_DIR, "lib")
 DEFAULT_DIR = os.path.join(LIB_DIR, "defaults")
 
-FILES = ["settings.json", "history.json"]
+FILES = ["settings.json"]
+SQL_FILE = "rules.sql"
+DB_PATH = os.path.join(USER_DIR, "rules.db")
 
 def run():
 	'''Sets up the program'''
@@ -34,4 +37,9 @@ def run():
 			status["user_dir"] = "created"
 		except OSError:
 			status["user_dir"] = "creation failed"
+	if os.path.exists(DB_PATH):
+		status["rules_db"] = "exists"
+	else:
+		sql.Database.create(DB_PATH, os.path.join(DEFAULT_DIR, SQL_FILE))
+		status["rules_db"] = "created"
 	return status

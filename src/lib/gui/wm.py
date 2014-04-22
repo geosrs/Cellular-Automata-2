@@ -16,7 +16,7 @@ class WindowManager(object):
 	def __init__(self, master, **options):
 		self.master = master
 		self.options = options
-		self.grid_options = self.options.get('grid_options', {})
+		self.place_options = options.get('place_options', {})
 		self.current = None
 		self.screens = {}
 			
@@ -37,7 +37,7 @@ class WindowManager(object):
 		if not self.screens:
 			raise ValueError("No screens set!")
 		if self.current:
-			self.current.grid_forget() # hide the previous window
+			self.current.place_forget() # hide the previous window
 		if 'inherit' not in options:
 			options['inherit'] = False
 		window = self.screens.get(screen, NOT_FOUND)
@@ -46,7 +46,9 @@ class WindowManager(object):
 		else:
 			if not isinstance(window, tk.Frame): # create a new Frame object if it does not exist already
 				window = window(self.master, self)
-			window.grid(**self.grid_options) # show the new window
+			# window.pack(**self.pack_options)
+			window.place(**self.place_options)
+			# window.grid(**self.grid_options) # show the new window
 			if hasattr(window, 'onload'):
 				window.onload()
 			self.current = window
