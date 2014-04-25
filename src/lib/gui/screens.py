@@ -87,7 +87,7 @@ class StartScreen(Screen):
 	def createInterface(self):
 		'''Creates the main interface'''
 		self.mainLabel = tk.Label(self.master, text = NAME, style = "Header.TLabel")
-		self.aboutButton = tk.Button(self, text = "About CA", command = lambda: self.WM.open(ABOUT), style = "TLabel")
+		self.aboutButton = tk.Button(self, text = "About CA", command = lambda: self.WM.open(ABOUT))
 		self.creditsButton = tk.Button(self, text = "Credits", command = lambda: self.WM.open(CREDITS))
 		self.startButton = tk.Button(self, text = "Start", command = lambda: self.WM.open(MAIN_PROGRAM))
 		self.helpButton = tk.Button(self, text = "Help", command = lambda: self.WM.open(HELP))
@@ -115,7 +115,7 @@ class AboutScreen(Screen):
 	def createInterface(self):
 		'''Creates the main About interface'''
 		self.mainLabel = tk.Label(self, text = "About", style = "Subheader.TLabel")
-		self.aboutText = tk.ScrolledText(self, height = 20, font = "Calibri 12")
+		self.aboutText = tk.ScrolledText(self, height = 15, font = "Calibri 12")
 		self.aboutText.insert(tk.END, DATA.about.text)
 		self.aboutText.configure(state = tk.DISABLED)
 		self.addNavigator(prev = "Home")
@@ -133,7 +133,7 @@ class HistoryScreen(Screen):
 
 	def createInterface(self):
 		'''Displays user history'''
-		self.baseQuery = "SELECT `rule_number`, `rule`, `image`, `time` FROM history ORDER BY `time` DESC LIMIT {limit} OFFSET {offset}"
+		self.baseQuery = "SELECT * FROM history ORDER BY `time` DESC LIMIT {limit} OFFSET {offset}"
 		self.db = DATABASE
 		self.db.setTable("history")
 		self.displayed = []
@@ -153,23 +153,47 @@ class HistoryScreen(Screen):
 
 	def onload(self):
 		'''Loads the latest rows'''
-		self.displayRows(0, 10)
+		self.displayRows(0, 10) # show the ten most recent rules
 
 	def displayRows(self, start = 0, end = 10):
 		'''Displays the rows from "start" to "end"'''
 		row_cursor = self.db.query(self.baseQuery.format(limit = end - start, offset = start))
-		rows = row_cursor.fetchall()
+		rows = self.db.fetch(row_cursor)
 		for widget in self.displayed:
 			widget.grid_forget()
 		for row_number, row in enumerate(rows, 1):
-			rule_number, rule_string, rule_image, rule_time = row
+			image_rule, rule, rule_number = row["image"], row["rule"], row["rule_number"]
 			ruleFrame = tk.Frame(self.historyFrame)
 			numberLabel = tk.Label(ruleFrame, text = rule_number)
-			ruleLabel = tk.Label(ruleFrame, text = rule_string)
+			ruleLabel = tk.Label(ruleFrame, text = image_rule if image_rule else rule)
 			numberLabel.pack(side = "left")
 			ruleLabel.pack(side = "right")
 			ruleFrame.grid(row = row_number)
+			ruleFrame.bind("<Button-1>", lambda event: self.openRule(rule_number))
 			self.displayed.append(ruleFrame)
+
+	def openRule(self, number):
+		'''Opens the "number" rule'''
+		print number, type(number)
+
+class CreditsScreen(Screen):
+	'''Shows the creator credits'''
+	current = CREDITS
+	prev = START
+
+	def createInterface(self):
+		'''Creates the main Credits interface'''
+		self.mainLabel = tk.Label(self, text = "About", style = "Subheader.TLabel")
+		self.creditsText = tk.ScrolledText(self, height = 10, font = "Calibri 12")
+		self.creditsText.insert(tk.END, DATA.credits.text)
+		self.creditsText.configure(state = tk.DISABLED)
+		self.addNavigator(prev = "Home")
+
+		self.gridWidgets([
+			self.mainLabel,
+			self.creditsText,
+			self.prevButton,
+			], padx = 5, pady = 5)
 
 ### Cellular Automata-related screens
 	
@@ -212,7 +236,7 @@ class Options_CellspaceScreen(Screen):
 			variable = self.dimensionVar, command = lambda: self.toggleHeight(False))
 		self.dim2D = tk.Radiobutton(self, text = "2 Dimensional", value = 2,
 			variable = self.dimensionVar, command = lambda: self.toggleHeight(True))
-		self.addNavigator()
+		self.addNavigator("Cell of Interest")
 
 		self.heightLabel.grid(row = 1, pady = 5)
 		self.heightSlider.grid(row = 2, pady = 5)
@@ -247,7 +271,7 @@ class Options_InterestScreen(Screen):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
 		self.caGrid = CAGrid(self, 3, 1 if OPTIONS.dimension == 1 else 3)
-		self.addNavigator()
+		self.addNavigator("Rules", "Cell Space")
 
 		self.gridWidgets([
 			self.mainLabel,
@@ -257,7 +281,8 @@ class Options_InterestScreen(Screen):
 
 	def setOptions(self):
 		'''Sets the global options'''
-		setOption("interest", self.caGrid.clicked())
+		clicked =  self.caGrid.clicked()
+		setOption("interest", clicked[0] if clicked else OPTIONS.interest)
 		return True
 
 	def onload(self):
@@ -267,13 +292,14 @@ class Options_InterestScreen(Screen):
 			# dimension changed --- create a new CAGrid
 			self.caGrid.configure(height = int(self.caGrid.configure("height")[-1]) * (1.0/3 if OPTIONS.dimension == 1 else 3))
 			self.caGrid.draw(3, newHeight)
+			self.caGrid.toggle([sorted(self.caGrid.cells.keys())[OPTIONS.interest]])
 		return True
 
 class Options_RuleScreen(Screen):
 	'''Interface for user to add Celluar Automata rules'''
 	current = OPTIONS_RULES
 	prev = OPTIONS_INTEREST
-	next = OPTIONS_CONFIRM
+	next = DRAW
 
 	def createInterface(self):
 		'''Creates the Rules interface'''
@@ -282,7 +308,7 @@ class Options_RuleScreen(Screen):
 		self.mainLabel = tk.Label(self, text = "Rules", style = "Subheader.TLabel")
 		self.ruleFrame = RuleDisplay(self, 5)
 		self.addRuleButton = tk.Button(self, text = "Add Rule", command = self.addRule)
-		self.addNavigator()
+		self.addNavigator("Draw", "Cell of Interest")
 
 		self.gridWidgets([
 			self.mainLabel,
@@ -330,36 +356,18 @@ class Options_RuleScreen(Screen):
 		setOption("rules", rules)
 		return True
 
-class Options_ConfirmScreen(Screen):
-	'''Confirms the User's options'''
-	current = OPTIONS_CONFIRM
-	prev = OPTIONS_RULES
-	next = DRAW
-
-	def onload(self):
-		'''Creates the option-confirmation interface'''
-		dimensionHeight = 1 if OPTIONS.dimension == 1 else 3
-		self.spaceLabel = tk.Label(self, text = "Cell Space", style = "OptionHeader.TLabel")
-		self.widthLabel = tk.Label(self, text = "Width: {} cells".format(OPTIONS["width"]))
-		self.heightLabel = tk.Label(self, text = "Height: {} cells".format(OPTIONS["height"]))
-		self.interestLabel = tk.Label(self, text = "Cell of Interest", style = "OptionHeader.TLabel")
-		self.interestGrid = CAGrid(self, 3, dimensionHeight, active = False, activeColor = "blue")
-		self.interestGrid.toggle(OPTIONS.interest)
-		self.addNavigator("Draw")
-
-		self.gridWidgets([
-			self.spaceLabel,
-			(self.widthLabel, self.heightLabel),
-			self.interestLabel,
-			self.interestGrid,
-			(self.prevButton, self.nextButton)
-			], padx = 5, pady = 5)
-
 class DrawScreen(Screen):
 	'''Displays the Cellular Automata'''
 	current = DRAW
-	prev = OPTIONS_CONFIRM
+	prev = OPTIONS_RULES
+	next = MAIN_PROGRAM
+
+	def createInterface(self):
+		'''Creates the main CA interface'''
+		self.addNavigator("Start Over", "Rules")
 
 	def onload(self):
 		'''Draws the Cellular Automata screen'''
-		DATABASE.insert("history", rule = ','.join('|'.join(map(str, rule)) for rule in OPTIONS.rules))
+		# add the latest rules to the history database
+		DATABASE.insert("history", dimension = OPTIONS.dimension, interest = OPTIONS.interest,
+			rule = ','.join('|'.join(map(str, rule)) for rule in OPTIONS.rules))

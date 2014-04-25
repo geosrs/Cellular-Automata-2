@@ -52,8 +52,7 @@ HISTORY = 6
 OPTIONS_SPACE = 7
 OPTIONS_INTEREST = 8
 OPTIONS_RULES =  9
-OPTIONS_CONFIRM = 10
-DRAW = 11
+DRAW = 10
 
 ### User Options
 
@@ -61,7 +60,7 @@ OPTIONS = xml.Object({
 	"width": 250,
 	"height": 250,
 	"dimension": 2,
-	"interest": [],
+	"interest": 2,
 	"rules": [],
 	})
 

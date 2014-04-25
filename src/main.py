@@ -4,7 +4,6 @@
 
 ''''
 Notes:
-	- need to fix the sizing when dimensions are changed
 
 Tasks:
 	Rushy: Interface/Main program optimization:

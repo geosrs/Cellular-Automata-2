@@ -37,21 +37,21 @@ class App(tk.BaseCustomWindow):
 		self.startScreen = StartScreen(self.master, self.WM)
 		self.programScreen = CAScreen(self.master, self.WM)
 		self.aboutScreen = AboutScreen(self.master, self.WM)
+		self.creditsScreen = CreditsScreen(self.master, self.WM)
 		self.historyScreen = HistoryScreen(self.master, self.WM)
 		self.optionsCellspaceScreen = Options_CellspaceScreen(self.master, self.WM)
 		self.optionsInterestScreen = Options_InterestScreen(self.master, self.WM)
 		self.optionsRulesScreen = Options_RuleScreen(self.master, self.WM)
-		self.optionsConfirmScreen = Options_ConfirmScreen(self.master, self.WM)
 		self.drawScreen = DrawScreen(self.master, self.WM)
 		
 		self.WM.set({ # Set the Window Manager's screens
 			START: self.startScreen,
 			MAIN_PROGRAM: self.programScreen,
 			ABOUT: self.aboutScreen,
+			CREDITS: self.creditsScreen,
 			HISTORY: self.historyScreen,
 			OPTIONS_SPACE: self.optionsCellspaceScreen,
 			OPTIONS_INTEREST: self.optionsInterestScreen,
 			OPTIONS_RULES: self.optionsRulesScreen,
-			OPTIONS_CONFIRM: self.optionsConfirmScreen,
 			DRAW: self.drawScreen,
 			})

@@ -1,8 +1,13 @@
 <data>
 	<!-- Any changes here will carry throughout the entire project -->
-	<title>Cellular Automata Project</title>
+	<title>Cellular Automata</title>
 	<authors>Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee</authors>
 	<copyright>Copyright Rushy Panchal et al. 2014</copyright>
+	<credits>
+		Created by Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, and Allan Lee.
+
+		Copyright 2014.
+	</credits>
 	<about>
 		<!-- About Text Goes Here -->
 	</about>
