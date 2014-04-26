@@ -1,8 +1,6 @@
 # George Georges
 # Cellular Automata Example
-# Cell Space: 1D, infinite
-# Neighborhood: adjacent, inclusive
-# Rule: one cell on only in the neighborhood turns the main cell on, else it turns off
+# Cell Space: 1D
 from graphics import *
 
 def main():
@@ -23,43 +21,45 @@ def generateCA(window, cellspace, rules, wrap = True):
     ymin = 0
     step = 1
     for y in reversed(range(ymin, ymax)): # starts from the top of the window and works down
-        print(cellspace)
+        #print(cellspace)
         for x in range(len(cellspace)):
             if cellspace[x] == 1:
                 window.plot(x, y, "black")
         cellspace = generateCellSpace(rules, cellspace)
         window.update() # window updates after every row
 
-def generateCellSpace(rules, state, wrap = True):
+def generateCellSpace(rules, state, wrap = False):
     '''input: rules is a list of lists of integers
     (i.e. [[-1,0,1], [-1,1], [0]]), where 0 is the
     cell of interest, and state is a 1D array of
     the current state of all cells in the cell space
     wrap is a boolean that states whether or not the
     cell space is a wrapping cell space'''
-    newstate = state[:] 
+    newstate = state[:]
+    indexlist = []
+    for a in range(len(rules)):
+        for b in range(len(rules[a])):
+             indexlist.append(rules[a][b])
+    minindex = min(indexlist)
+    maxindex = max(indexlist)
     for cell in range(len(state)):
         for i in range(len(rules)): # i represents the ith rule in rules
-            #for j in range(len(rules[i])): # j represents the jth parameter of rule i
-                if wrap == True:
-                    if all([newstate[(cell + rules[i][j])%len(newstate)]]) == 1:
-                        newstate[cell] = 1
-                        # cell += 1
-                        i = 0
-                        j = 0
-                        break
-                    else:
-                        newstate[cell] = 0
+            ruleset = {'on': rules[i], 'off': list(set(range(minindex, maxindex+1)) - set(rules[i]))}
+            if wrap == True:
+                if all(state[(cell + index)%len(state)] == 1 for index in ruleset['on']) and all(state[(cell + index)%len(state)] == 0 for index in ruleset['off']):
+                    newstate[cell] = 1
+                    break
                 else:
-                    if 0 < rules[i][j] + cell < len(newstate) - 1:
-                        if all([newstate[cell + rules[i][j]]]) == 1:
-                            newstate[cell] = 1
-                            # cell += 1
-                            i = 0
-                            j = 0
-                            break
-                        else:
-                            newstate[cell] = 0
+                    newstate[cell] = 0
+            else:
+                if all(0 < cell + index < len(state) - 1 and state[(cell + index)] == 1 for index in ruleset['on']) and all(0 < cell + index < len(state) - 1 and state[(cell + index)] == 0 for index in ruleset['off']):
+                    newstate[cell] = 1
+                    i = 0
+                    j = 0
+                    break
+                else:
+                    newstate[cell] = 0
+            
     return newstate
 
 if __name__ == "__main__":
