@@ -5,22 +5,24 @@ from graphics import *
 
 WIDTH = 401
 HEIGHT = 401
-INTEREST = 1
+INTEREST = 0
+WRAP = False
+
 RULES = [[-1], [0], [1]]
+CELLSPACE = [0] * WIDTH
+CELLSPACE[int(WIDTH/ 2)] = 1 # set the center cell to 1
 
 def main():
-	# CA = GraphWin(None, WIDTH, HEIGHT, autoflush = False) # this is to run with Tkinter
-	# CA.grid()
-	CA = GraphWin("Cellular Automata", WIDTH, HEIGHT, autoflush = False)
-	CA.setBackground("white") # white background saves computational power (off cells are white and do not need to be plotted)
-	CA.setCoords(0, 0, WIDTH, HEIGHT)
-	cellspace = [0] * WIDTH
-	cellspace[int(WIDTH / 2)] = 1 # set the center cell to 1
-	rules = RULES
-	generateCA(CA, cellspace, rules)
+	CA = GraphWin(None, WIDTH, HEIGHT, autoflush = False) # this is to run with Tkinter
+	CA.grid()
+	# CA = GraphWin("Cellular Automata", WIDTH, HEIGHT, autoflush = False)
+	generateCA(CA, CELLSPACE, RULES, WIDTH, HEIGHT, WRAP)
 
-def generateCA(window, cellspace, rules, wrap = True):
-	ymin, ymax = 0, WIDTH
+def generateCA(window, cellspace, rules, width, height, wrap = True):
+	'''Generates the CA on the window'''
+	window.setBackground("white") # white background saves computational power (off cells are white and do not need to be plotted)
+	window.setCoords(0, 0, width, height)
+	ymin, ymax = 0, width
 	minindex, maxindex = rules[0][0], rules[0][0]
 	for rule in rules: # find the minimum and maximum of all the rules
 		for rule_item in rule:
@@ -35,7 +37,7 @@ def generateCA(window, cellspace, rules, wrap = True):
 		for x in range(len(cellspace)):
 			if cellspace[x] == 1: # only print the "on" cells
 				window.plot(x, y, "black")
-		cellspace = generateCellSpace(rulesets, cellspace)
+		cellspace = generateCellSpace(rulesets, cellspace, wrap)
 		window.update() # window updates after every row
 
 def generateCellSpace(rulesets, state, wrap = False):
