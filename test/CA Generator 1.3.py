@@ -5,8 +5,8 @@ from graphics import *
 
 WIDTH = 401
 HEIGHT = 401
-INTEREST = 0
-WRAP = False
+INTEREST = 2
+WRAP = True
 
 RULES = [[-1], [0], [1]]
 CELLSPACE = [0] * WIDTH
@@ -55,7 +55,7 @@ def generateCellSpace(rulesets, state, wrap = False):
 				# if the rule matches (on cells are on and rest are off), then turn the cell of interest on
 				if (all(state[(cell + index) % wrap_amount] == 1 for index in ruleset['on'])
 					and all(state[(cell + index) % wrap_amount] == 0 for index in ruleset['off'])):
-						newstate[cell + INTEREST] = 1
+						newstate[(cell + INTEREST) % wrap_amount] = 1
 						break
 	else:
 		for cell in range(wrap_amount):
