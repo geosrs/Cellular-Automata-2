@@ -52,5 +52,6 @@ class WindowManager(object):
 			if hasattr(window, 'onload'):
 				window.onload()
 			self.current = window
+		self.master.update()
 		return True
 		

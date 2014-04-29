@@ -1,5 +1,6 @@
 {
 	"font": "Calibri",
 	"height": "400",
-	"width": "400"
+	"width": "400",
+	"fullscreen": false
 }

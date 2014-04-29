@@ -38,21 +38,18 @@ DATABASE = sql.Database(DATABASE_PATH)
 ### Supplementary constants
 
 NAME = DATA.title.text
-AUTHORS = DATA.authors.text
-COPYRIGHT = DATA.copyright.text
 
 ### Window-managing constants --- they identify the various windows
 
-START = 1
-MAIN_PROGRAM = 2
-ABOUT = 3
-HELP = 4
-CREDITS = 5
-HISTORY = 6
-OPTIONS_SPACE = 7
-OPTIONS_INTEREST = 8
-OPTIONS_RULES =  9
-DRAW = 10
+START = "Home"
+MAIN_PROGRAM = "Main Program"
+ABOUT = "About"
+CREDITS = "Credits"
+HISTORY = "History"
+OPTIONS_SPACE = "Cell Space"
+OPTIONS_INTEREST = "Cell of Interest"
+OPTIONS_RULES =  "Rules"
+DRAW = "Draw"
 
 ### User Options
 

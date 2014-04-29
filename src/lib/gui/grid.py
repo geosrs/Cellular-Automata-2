@@ -20,7 +20,7 @@ class CAGrid(tk.BaseCustomWidget):
 		self.hoverColor = tk.dictGet(options, "hoverColor", "blue")
 		self.outlineColor = tk.dictGet(options, "outlineColor", "black")
 		self.isActive = tk.dictGet(options, "active", True)
-		options["width"] = options["height"] = tk.dictGet(options, "size", 200)
+		options["width"] = options["height"] = tk.dictGet(options, "size", 200) + 1
 		self.graph = graph.GraphWin(self.mainFrame, **options)
 		self.graph.grid()
 		self.draw()
@@ -64,10 +64,14 @@ class CAGrid(tk.BaseCustomWidget):
 			cell =  self.cells[index]
 			cell.click(force = True)
 
-	def clicked(self):
+	def clicked(self, convert = True):
 		'''Returns the clicked items'''
 		# get the coordinates of only the clicked cells
-		return map(lambda cell: self.coordinateToPoint(cell.x, cell.y), filter(lambda cell: cell.clicked, self.cells.values()))
+		points = filter(lambda cell: cell.clicked, self.cells.values())
+		if convert:
+			return map(lambda cell: self.coordinateToPoint(cell.x, cell.y), points)
+		else:
+			return map(lambda cell: [cell.x - 2, cell.y - 2], points)
 
 class CACell(tk.BaseCustomWidget):
 	'''A clickable cell'''

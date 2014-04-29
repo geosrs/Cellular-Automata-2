@@ -6,6 +6,7 @@
 ### Imports
 
 import tk.ttkExtra as tk
+import tk.graphics as graph
 
 from lib.constants import *
 from grid import *
@@ -19,10 +20,14 @@ class Screen(tk.Frame):
 	prev = START
 	next = MAIN_PROGRAM
 
-	def __init__(self, master, wm):
+	def __init__(self, master, wm, n = None):
 		self.master = master
 		self.WM = wm
 		tk.Frame.__init__(self, self.master) # create a new Frame instance
+		if not n is None:
+			self.current = n
+			self.prev = n - 1
+			self.next = n + 1
 		self.createInterface()
 
 	def createInterface(self):
@@ -37,10 +42,14 @@ class Screen(tk.Frame):
 		'''Override in child classes'''
 		pass
 
-	def addNavigator(self, next = "Next", prev = "Previous", **options):
+	def addNavigator(self, next = None, prev = None, **options):
 		'''Adds the navigation buttons'''
 		nextCommand = options.get("nextCommand", lambda: self.setOptions())
 		prevCommand = options.get("prevCommand", lambda: self.setOptions())
+		if not next:
+			next = self.next
+		if not prev:
+			prev = self.prev
 		self.nextButton = tk.Button(self, text = next, command = lambda: nextCommand() + self.WM.open(self.next))
 		self.prevButton = tk.Button(self, text = prev, command = lambda: prevCommand() + self.WM.open(self.prev))
 
@@ -90,7 +99,6 @@ class StartScreen(Screen):
 		self.aboutButton = tk.Button(self, text = "About CA", command = lambda: self.WM.open(ABOUT))
 		self.creditsButton = tk.Button(self, text = "Credits", command = lambda: self.WM.open(CREDITS))
 		self.startButton = tk.Button(self, text = "Start", command = lambda: self.WM.open(MAIN_PROGRAM))
-		self.helpButton = tk.Button(self, text = "Help", command = lambda: self.WM.open(HELP))
 		self.historyButton = tk.Button(self, text = "User History", command = lambda: self.WM.open(HISTORY))
 		self.exitButton = tk.Button(self, text = "Exit", command = self.master.close, style = "Quit.TButton")
 
@@ -100,7 +108,6 @@ class StartScreen(Screen):
 			self.startButton,
 			self.aboutButton,
 			self.creditsButton,
-			self.helpButton,
 			self.historyButton,
 			self.exitButton,
 			], pady = 5)
@@ -115,16 +122,31 @@ class AboutScreen(Screen):
 	def createInterface(self):
 		'''Creates the main About interface'''
 		self.mainLabel = tk.Label(self, text = "About", style = "Subheader.TLabel")
-		self.aboutText = tk.ScrolledText(self, height = 15, font = "Calibri 12")
-		self.aboutText.insert(tk.END, DATA.about.text)
-		self.aboutText.configure(state = tk.DISABLED)
+		self.screenFrame = tk.Frame(self)
+		self.screens_wm = WindowManager(self.screenFrame,
+			place_options = {'anchor': tk.CENTER, 'relx': 0.5, 'rely': 0.5})
+		self.addScreens()
+		self.screens_wm.open(1)
 		self.addNavigator(prev = "Home")
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.aboutText,
+			self.screenFrame,
 			self.prevButton,
 			], padx = 5, pady = 5)
+
+	def addScreens(self):
+		'''Adds the screens to the widget'''
+		self.initialScreen = Screen(self.screenFrame, self.screens_wm, 1)
+		self.secondScreen = Screen(self.screenFrame, self.screens_wm, 2)
+
+		for screen in [self.initialScreen, self.secondScreen]:
+			screen.addNavigator()
+
+		self.screens_wm.set({
+			1: self.initialScreen,
+			2: self.secondScreen,
+			})
 	
 class HistoryScreen(Screen):
 	'''Shows the user's history'''
@@ -236,7 +258,7 @@ class Options_CellspaceScreen(Screen):
 			variable = self.dimensionVar, command = lambda: self.toggleHeight(False))
 		self.dim2D = tk.Radiobutton(self, text = "2 Dimensional", value = 2,
 			variable = self.dimensionVar, command = lambda: self.toggleHeight(True))
-		self.addNavigator("Cell of Interest")
+		self.addNavigator()
 
 		self.heightLabel.grid(row = 1, pady = 5)
 		self.heightSlider.grid(row = 2, pady = 5)
@@ -270,8 +292,8 @@ class Options_InterestScreen(Screen):
 	def createInterface(self):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
-		self.caGrid = CAGrid(self, 3, 1 if OPTIONS.dimension == 1 else 3)
-		self.addNavigator("Rules", "Cell Space")
+		self.caGrid = CAGrid(self, 5, 1 if OPTIONS.dimension == 1 else 5)
+		self.addNavigator()
 
 		self.gridWidgets([
 			self.mainLabel,
@@ -287,11 +309,11 @@ class Options_InterestScreen(Screen):
 
 	def onload(self):
 		'''Called when the screen is loaded'''
-		newHeight = 1 if OPTIONS.dimension == 1 else 3
+		newHeight = 1 if OPTIONS.dimension == 1 else 5
 		if newHeight != self.caGrid.height:
 			# dimension changed --- create a new CAGrid
-			self.caGrid.configure(height = int(self.caGrid.configure("height")[-1]) * (1.0/3 if OPTIONS.dimension == 1 else 3))
-			self.caGrid.draw(3, newHeight)
+			self.caGrid.configure(height = int(self.caGrid.configure("height")[-1]) * (1.0/5if OPTIONS.dimension == 1 else 5))
+			self.caGrid.draw(5, newHeight)
 			self.caGrid.toggle([sorted(self.caGrid.cells.keys())[OPTIONS.interest]])
 		return True
 
@@ -308,7 +330,7 @@ class Options_RuleScreen(Screen):
 		self.mainLabel = tk.Label(self, text = "Rules", style = "Subheader.TLabel")
 		self.ruleFrame = RuleDisplay(self, 5)
 		self.addRuleButton = tk.Button(self, text = "Add Rule", command = self.addRule)
-		self.addNavigator("Draw", "Cell of Interest")
+		self.addNavigator()
 
 		self.gridWidgets([
 			self.mainLabel,
@@ -323,7 +345,7 @@ class Options_RuleScreen(Screen):
 		self.rules[self.currentRule] = newRuleFrame
 		newRuleFrame.number = self.currentRule
 		ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = self.currentRule), style = "OptionHeader.TLabel")
-		ruleGrid = CAGrid(newRuleFrame, 3, 1 if OPTIONS.dimension == 1 else 3)
+		ruleGrid = CAGrid(newRuleFrame, 5, 1 if OPTIONS.dimension == 1 else 5)
 		newRuleFrame.ca_grid = ruleGrid
 
 		newRuleFrame.gridWidgets([
@@ -335,22 +357,23 @@ class Options_RuleScreen(Screen):
 
 	def onload(self):
 		'''Changes the grid dimensions'''
-		newHeight = 1 if OPTIONS.dimension == 1 else 3
+		newHeight = 1 if OPTIONS.dimension == 1 else 5
 		if not self.rules:
 			return False
 		if newHeight != self.rules.values()[-1].ca_grid.height:
 			# dimension changed --- create a new CAGrid
 			for rule in self.rules.values():
 				grid = rule.ca_grid
-				grid.configure(height = int(grid.configure("height")[-1]) * (1.0/3 if OPTIONS.dimension == 1 else 3))
-				grid.draw(3, newHeight)
+				grid.configure(height = int(grid.configure("height")[-1]) * (1.0/5 if OPTIONS.dimension == 1 else 5))
+				grid.draw(5, newHeight)
 		return True
 
 	def setOptions(self):
 		'''Sets  the global options'''
 		rules = []
+		convert = OPTIONS.dimension == 1
 		for rule_grid in self.rules.values():
-			rule_list = rule_grid.ca_grid.clicked()
+			rule_list = rule_grid.ca_grid.clicked(convert)
 			if rule_list:
 				rules.append(rule_list)
 		setOption("rules", rules)
@@ -364,10 +387,33 @@ class DrawScreen(Screen):
 
 	def createInterface(self):
 		'''Creates the main CA interface'''
-		self.addNavigator("Start Over", "Rules")
+		self.ca_screen = graph.GraphWin(self, width = SETTINGS.width, height = SETTINGS.height)
+		self.ca_screen.setBackground("white")
+		self.descFrame = tk.Frame(self)
+		self.descLabel = tk.Label(self.descFrame, text = "Description", style = "Subheader.TLabel")
+		self.description = tk.Label(self.descFrame, text = DATA.about.text)
+		self.exampleLabel = tk.Label(self.descFrame, text = "Examples", style = "Subheader.TLabel")
+		self.exampleFrame = tk.Frame(self.descFrame)
+
+		self.optionFrame = tk.Frame(self)
+		self.options_label = tk.Label(self.optionFrame, text = "Options", style = "Subheader.TLabel")
+
+		self.addNavigator()
+
+		self.descFrame.gridWidgets([
+			self.descLabel,
+			self.description,
+			self.exampleLabel,
+			self.exampleFrame,
+			])
+
+		self.gridWidgets([
+			(self.descFrame, self.ca_screen, self.optionFrame),
+			self.nextButton,
+			], padx = 5, pady = 5)
 
 	def onload(self):
 		'''Draws the Cellular Automata screen'''
 		# add the latest rules to the history database
 		DATABASE.insert("history", dimension = OPTIONS.dimension, interest = OPTIONS.interest,
-			rule = ','.join('|'.join(map(str, rule)) for rule in OPTIONS.rules))
+			rule = str(OPTIONS.rules))

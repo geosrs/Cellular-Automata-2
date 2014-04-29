@@ -19,18 +19,18 @@ class App(tk.BaseCustomWindow):
 	'''Main application'''
 	def __init__(self, master):
 		self.master = master
+		self.master.cleanup = DATABASE.close
 		self.master.title(NAME)
-		self.master.geometry("{w}x{h}".format(w = int(tk.SCREENDIM['w'] * 0.66), h = int(tk.SCREENDIM['h'] * 0.66)))
+		if SETTINGS.fullscreen:
+			self.master.fullscreen(False)
+		else:
+			self.master.geometry("{w}x{h}".format(w = int(tk.SCREENDIM['w'] * 0.66), h = int(tk.SCREENDIM['h'] * 0.66)))
 		self.WM = WindowManager(self.master,
 			place_options = {'anchor': tk.CENTER, 'relx': 0.5, 'rely': 0.5})
 		self.createScreens()
 		self.WM.open(START)
-		self.copyrightLabel = tk.Label(self.master, text = COPYRIGHT)
+		self.copyrightLabel = tk.Label(self.master, text = DATA.copyright.text)
 		self.copyrightLabel.place(anchor = tk.S, relx = 0.5, rely = 1)
-
-	def cleanup(self):
-		'''Actions before the program closes'''
-		DATABASE.close()
 
 	def createScreens(self):
 		'''Creates all of the screens'''
