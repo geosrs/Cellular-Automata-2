@@ -6,6 +6,7 @@
 ### Imports
 
 import tk.ttkExtra as tk
+import thread
 
 from lib.constants import *
 from screens import *
@@ -34,24 +35,17 @@ class App(tk.BaseCustomWindow):
 
 	def createScreens(self):
 		'''Creates all of the screens'''
-		self.startScreen = StartScreen(self.master, self.WM)
-		self.programScreen = CAScreen(self.master, self.WM)
-		self.aboutScreen = AboutScreen(self.master, self.WM)
-		self.creditsScreen = CreditsScreen(self.master, self.WM)
-		self.historyScreen = HistoryScreen(self.master, self.WM)
-		self.optionsCellspaceScreen = Options_CellspaceScreen(self.master, self.WM)
-		self.optionsInterestScreen = Options_InterestScreen(self.master, self.WM)
-		self.optionsRulesScreen = Options_RuleScreen(self.master, self.WM)
 		self.drawScreen = DrawScreen(self.master, self.WM)
-		
+
 		self.WM.set({ # Set the Window Manager's screens
-			START: self.startScreen,
-			MAIN_PROGRAM: self.programScreen,
-			ABOUT: self.aboutScreen,
-			CREDITS: self.creditsScreen,
-			HISTORY: self.historyScreen,
-			OPTIONS_SPACE: self.optionsCellspaceScreen,
-			OPTIONS_INTEREST: self.optionsInterestScreen,
-			OPTIONS_RULES: self.optionsRulesScreen,
+			START: StartScreen,
+			MAIN_PROGRAM: CAScreen,
+			ABOUT: AboutScreen,
+			CREDITS: CreditsScreen,
+			HISTORY: HistoryScreen,
+			SETTINGS_EDIT: SettingsScreen,
+			OPTIONS_SPACE: Options_CellspaceScreen,
+			OPTIONS_INTEREST: Options_InterestScreen,
+			OPTIONS_RULES: Options_RuleScreen,
 			DRAW: self.drawScreen,
 			})

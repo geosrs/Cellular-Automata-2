@@ -11,6 +11,8 @@ import tk.graphics as graph
 from lib.constants import *
 from grid import *
 from wm import *
+from styles import *
+from cellular_automata import *
 
 ### Main classes
 
@@ -99,6 +101,7 @@ class StartScreen(Screen):
 		self.aboutButton = tk.Button(self, text = "About CA", command = lambda: self.WM.open(ABOUT))
 		self.creditsButton = tk.Button(self, text = "Credits", command = lambda: self.WM.open(CREDITS))
 		self.startButton = tk.Button(self, text = "Start", command = lambda: self.WM.open(MAIN_PROGRAM))
+		self.settingsButton = tk.Button(self, text = "Settings", command = lambda: self.WM.open(SETTINGS_EDIT))
 		self.historyButton = tk.Button(self, text = "User History", command = lambda: self.WM.open(HISTORY))
 		self.exitButton = tk.Button(self, text = "Exit", command = self.master.close, style = "Quit.TButton")
 
@@ -106,6 +109,7 @@ class StartScreen(Screen):
 
 		self.gridWidgets([
 			self.startButton,
+			self.settingsButton,
 			self.aboutButton,
 			self.creditsButton,
 			self.historyButton,
@@ -217,6 +221,54 @@ class CreditsScreen(Screen):
 			self.prevButton,
 			], padx = 5, pady = 5)
 
+class SettingsScreen(Screen):
+	"""Allows the user to change the program settings"""
+	current = SETTINGS_EDIT
+	prev = START
+
+	def createInterface(self):
+		'''Creates the main settings interface'''
+		self.mainLabel = tk.Label(self, text = "Settings", style = "Subheader.TLabel")
+		self.fullscreenVar = tk.IntVar(self)
+		self.fullscreenVar.set(SETTINGS.fullscreen)
+		self.fullscreenOption = tk.Checkbutton(self, text = "Fullscreen", variable = self.fullscreenVar)
+		self.allowInitialVar = tk.IntVar(self)
+		self.allowInitialVar.set(SETTINGS.initial)
+		self.allowInitialOption = tk.Checkbutton(self, text = "Initial Cellstate Input", variable = self.allowInitialVar)
+		# should have sliders for width and height
+		self.fontLabel = tk.Label(self, text = "Program Font", style = "OptionHeader.TLabel")
+		self.fontEntry = tk.Entry(self, width = 20, justify = tk.CENTER)
+		self.fontEntry.insert(tk.END, SETTINGS.font)
+		self.saveButton = tk.Button(self, text = "Save", command = self.saveSettings)
+		self.addNavigator()
+
+		self.gridWidgets([
+			self.mainLabel,
+			self.fullscreenOption,
+			self.allowInitialOption,
+			(self.fontLabel, self.fontEntry),
+			self.saveButton,
+			self.prevButton,
+			], padx = 5, pady = 5)
+
+	def saveSettings(self):
+		'''Saves the settings'''
+		SETTINGS.fullscreen = bool(self.fullscreenVar.get())
+		SETTINGS.font = self.fontEntry.get()
+		SETTINGS.initial = bool(self.allowInitialVar.get())
+
+		if SETTINGS.fullscreen:
+			self.master.geometry("+0+0")
+			self.master.fullscreen(False)
+		else:
+			self.master.overrideredirect(0)
+			self.master.geometry("{w}x{h}".format(w = int(tk.SCREENDIM['w'] * 0.66), h = int(tk.SCREENDIM['h'] * 0.66)))
+			self.master.center()
+		initializeStyles(self.master)
+
+		saveSettings(SETTINGS)
+		self.WM.open(START)
+
 ### Cellular Automata-related screens
 	
 class CAScreen(Screen):
@@ -245,12 +297,12 @@ class Options_CellspaceScreen(Screen):
 		'''Creates the interface for the Cellspace Options window'''
 		self.mainLabel = tk.Label(self, text = "Cellspace", style = "Subheader.TLabel")
 		self.widthLabel = tk.Label(self, text = "Grid Width", style = "OptionHeader.TLabel")
-		self.widthSlider = tk.LabelledScale(self, type = int, from_ = 1, to = tk.SCREENDIM["width"],
-			length = 250, default = OPTIONS.width, step = 5, edit = True)
+		self.widthSlider = tk.LabelledScale(self, type = int, from_ = 1, to = SETTINGS.width,
+			length = 250, default = OPTIONS.width, step = 2, edit = True)
 		self.heightFrame = tk.Frame(self)
 		self.heightLabel = tk.Label(self.heightFrame, text = "Grid Height", style = "OptionHeader.TLabel")
-		self.heightSlider = tk.LabelledScale(self.heightFrame, type = int, from_ = 1, to = tk.SCREENDIM["height"], 
-			length = 250, default = OPTIONS.height, step = 5, edit = True)
+		self.heightSlider = tk.LabelledScale(self.heightFrame, type = int, from_ = 1, to = SETTINGS.height, 
+			length = 250, default = OPTIONS.height, step = 2, edit = True)
 		self.dimensionVar = tk.IntVar(self)
 		self.dimensionVar.set(OPTIONS.dimension)
 		# disable the height slider if 1D is selected
@@ -278,9 +330,9 @@ class Options_CellspaceScreen(Screen):
 
 	def setOptions(self, again = False):
 		'''Sets the global options'''
-		setOption("width", self.widthSlider.get())
-		setOption("height", self.heightSlider.get())
 		setOption("dimension", self.dimensionVar.get())
+		setOption("width", self.widthSlider.get())
+		setOption("height", 1 if OPTIONS.dimension == 1 else self.heightSlider.get())
 		return True
 
 class Options_InterestScreen(Screen):
@@ -292,7 +344,8 @@ class Options_InterestScreen(Screen):
 	def createInterface(self):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
-		self.caGrid = CAGrid(self, 5, 1 if OPTIONS.dimension == 1 else 5)
+		self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+		self.caGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		self.addNavigator()
 
 		self.gridWidgets([
@@ -312,9 +365,9 @@ class Options_InterestScreen(Screen):
 		newHeight = 1 if OPTIONS.dimension == 1 else 5
 		if newHeight != self.caGrid.height:
 			# dimension changed --- create a new CAGrid
-			self.caGrid.configure(height = int(self.caGrid.configure("height")[-1]) * (1.0/5if OPTIONS.dimension == 1 else 5))
+			self.caGrid.configure(height = SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 			self.caGrid.draw(5, newHeight)
-			self.caGrid.toggle([sorted(self.caGrid.cells.keys())[OPTIONS.interest]])
+			self.caGrid.toggle([(0, 2)])
 		return True
 
 class Options_RuleScreen(Screen):
@@ -345,7 +398,8 @@ class Options_RuleScreen(Screen):
 		self.rules[self.currentRule] = newRuleFrame
 		newRuleFrame.number = self.currentRule
 		ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = self.currentRule), style = "OptionHeader.TLabel")
-		ruleGrid = CAGrid(newRuleFrame, 5, 1 if OPTIONS.dimension == 1 else 5)
+		ruleGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+		ruleGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		newRuleFrame.ca_grid = ruleGrid
 
 		newRuleFrame.gridWidgets([
@@ -364,7 +418,7 @@ class Options_RuleScreen(Screen):
 			# dimension changed --- create a new CAGrid
 			for rule in self.rules.values():
 				grid = rule.ca_grid
-				grid.configure(height = int(grid.configure("height")[-1]) * (1.0/5 if OPTIONS.dimension == 1 else 5))
+				grid.configure(height = SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 				grid.draw(5, newHeight)
 		return True
 
@@ -389,6 +443,9 @@ class DrawScreen(Screen):
 		'''Creates the main CA interface'''
 		self.ca_screen = graph.GraphWin(self, width = SETTINGS.width, height = SETTINGS.height)
 		self.ca_screen.setBackground("white")
+		self.ca_grid = CAGrid(self, SETTINGS.width, SETTINGS.height, activeColor = "red")
+		self.ca_grid.setBackground("white")
+		self.ca_grid.draw(OPTIONS.width, OPTIONS.height, False)
 		self.descFrame = tk.Frame(self)
 		self.descLabel = tk.Label(self.descFrame, text = "Description", style = "Subheader.TLabel")
 		self.description = tk.Label(self.descFrame, text = DATA.about.text)
@@ -398,6 +455,7 @@ class DrawScreen(Screen):
 		self.optionFrame = tk.Frame(self)
 		self.options_label = tk.Label(self.optionFrame, text = "Options", style = "Subheader.TLabel")
 
+		self.drawButton = tk.Button(self, text = "Draw", command = self.drawCA)
 		self.addNavigator()
 
 		self.descFrame.gridWidgets([
@@ -409,11 +467,50 @@ class DrawScreen(Screen):
 
 		self.gridWidgets([
 			(self.descFrame, self.ca_screen, self.optionFrame),
-			self.nextButton,
+			(self.prevButton, self.drawButton ,self.nextButton),
 			], padx = 5, pady = 5)
 
-	def onload(self):
+	def onload(self, force = False):
 		'''Draws the Cellular Automata screen'''
 		# add the latest rules to the history database
-		DATABASE.insert("history", dimension = OPTIONS.dimension, interest = OPTIONS.interest,
-			rule = str(OPTIONS.rules))
+		if OPTIONS.rules and OPTIONS.interest:
+			DATABASE.insert("history", dimension = OPTIONS.dimension, interest = OPTIONS.interest,
+				rule = str(OPTIONS.rules))
+		if SETTINGS.initial:
+			self.ca_screen.grid_remove()
+			self.ca_grid.grid(row = 1, column = 2, padx = 5, pady = 5)
+
+			if OPTIONS.height != self.ca_grid.height_cells:
+				# need to change the height
+				self.ca_grid.draw(OPTIONS.width, OPTIONS.height, False)
+			if force:
+				self.ca_grid.draw(OPTIONS.width, OPTIONS.height)
+
+	def drawCA(self):
+		'''Draws the cellular automata on the graph'''
+		self.ca_screen.clear()
+		self.ca_screen.grid()
+		self.ca_grid.mainFrame.grid_remove()
+		self.ca_grid.proceed = False
+
+		# need to make this compatible with 1D
+		# also want a different initial state selection method
+		if OPTIONS.dimension == 1:
+			cellstate = [0] * OPTIONS.width
+		else:
+			cellstate = [[0] * OPTIONS.width for i in xrange(OPTIONS.height)]
+		if SETTINGS.initial:
+			if isinstance(cellstate[0], list):
+				for x, y in self.ca_grid.clicked(False):
+					cellstate[x][y] = 1
+			else:
+				for x in self.ca_grid.clicked(False):
+					cellstate[x] = 1
+		else:
+			half_width = int(OPTIONS.width / 2)
+			if isinstance(cellstate[0], list):
+				cellstate[int(OPTIONS.height / 2)][half_width] = 1
+			else:
+				cellstate[half_width] = 1
+		generateCA(self.ca_screen, cellstate, OPTIONS.rules, self.ca_screen.getWidth(), self.ca_screen.getHeight(),
+			OPTIONS.dimension, OPTIONS.wrap)

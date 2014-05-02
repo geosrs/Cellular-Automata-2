@@ -11,11 +11,10 @@ from lib.constants import *
 
 ### Other Constants
 
-BASE_FONT = SETTINGS.font
-
 def initializeStyles(window):
 	'''Initializes the styles for the window'''
 	global STYLES
+	BASE_FONT = SETTINGS.font
 	STYLES = tk.createBaseStyles(window, (BASE_FONT, 12)) # create the base styles
 	# other styles
 	tk.configureStyle(STYLES["Label"], "Header.TLabel", foreground = "red",

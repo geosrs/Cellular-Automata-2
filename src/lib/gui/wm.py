@@ -46,6 +46,7 @@ class WindowManager(object):
 		else:
 			if not isinstance(window, tk.Frame): # create a new Frame object if it does not exist already
 				window = window(self.master, self)
+				self.screens[screen] = window
 			# window.pack(**self.pack_options)
 			window.place(**self.place_options)
 			# window.grid(**self.grid_options) # show the new window

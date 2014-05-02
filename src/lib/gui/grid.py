@@ -6,29 +6,34 @@
 ### Imports
 
 import tk.ttkExtra as tk
-import tk.graphics as graph
 
 ### Main classes
 
 class CAGrid(tk.BaseCustomWidget):
-	'''Displays a CA grid interface'''
-	def __init__(self, master, w, h, **options):
+	'''Creates a CAGrid object'''
+	def __init__(self, master, width, height, **options):
 		self.master = master
-		self.width, self.height, self.options = w, h, options
 		self.mainFrame = tk.Frame(self.master)
+		self.width, self.height = width, height
 		self.activeColor = tk.dictGet(options, "activeColor", "black")
 		self.hoverColor = tk.dictGet(options, "hoverColor", "blue")
 		self.outlineColor = tk.dictGet(options, "outlineColor", "black")
-		self.isActive = tk.dictGet(options, "active", True)
-		options["width"] = options["height"] = tk.dictGet(options, "size", 200) + 1
-		self.graph = graph.GraphWin(self.mainFrame, **options)
+		self.graph = tk.Canvas(self.mainFrame, width = self.width, height = self.height, **options)
 		self.graph.grid()
-		self.draw()
+		self.graph.bind("<Button-1>", lambda event: self.click(event.x, event.y))
+		self.graph.bind("<B1-Motion>", lambda event: self.click(event.x, event.y))
+		self.setBackground("white")
+		self.cells = {}
 	
-	def configure(self, *kw, **kwargs):
+	def configure(self, *args, **kwargs):
 		'''Configures the CAGrid'''
-		return self.graph.configure(*kw, **kwargs)
+		return self.graph.configure(*args, **kwargs)
 
+	def setBackground(self, color):
+		'''Sets the background color of the CAGrid'''
+		self.background = color
+		self.graph.configure(background = color)
+		
 	def coordinateToPoint(self, x, y):
 		'''Transforms the (x, y) board coordinate into a linear point'''
 		return (self.width * (y + 1) + x) - 1
@@ -42,69 +47,46 @@ class CAGrid(tk.BaseCustomWidget):
 			x = self.width
 			y -= 1
 		return (x, y)
-
-	def draw(self, width = None, height = None):
-		'''Draws the grid'''
-		self.cells = {}
-		self.graph.clear()
-		self.width = width if width else self.width
-		self.height = height if height else self.height
-		self.graph.setCoords(1, 1, self.width + 1, self.height + 1)
-		for x in xrange(1, self.width + 1):
-			for y in xrange(1, self.height + 1):
-				# create a new clickable cell
-				cell = CACell(self.graph, x = x, y = y, active = self.activeColor,
-					hover = self.hoverColor, outline = self.outlineColor, isActive = self.isActive)
-				self.cells[self.coordinateToPoint(x, y)] = cell
-		self.graph.update()
-
-	def toggle(self, cells):
-		'''Toggles the cells on or off, depending on their current state'''
-		for index in cells:
-			cell =  self.cells[index]
-			cell.click(force = True)
-
-	def clicked(self, convert = True):
-		'''Returns the clicked items'''
-		# get the coordinates of only the clicked cells
-		points = filter(lambda cell: cell.clicked, self.cells.values())
-		if convert:
-			return map(lambda cell: self.coordinateToPoint(cell.x, cell.y), points)
-		else:
-			return map(lambda cell: [cell.x - 2, cell.y - 2], points)
-
-class CACell(tk.BaseCustomWidget):
-	'''A clickable cell'''
-	def __init__(self, master, **options):
-		self.master = master
-		self.options = options
-		self.x, self.y = options.get("x", 0), options.get("y", 0)
-		self.activeColor = options.get("active", "black")
-		self.hoverColor = options.get("hover", "blue")
-		self.outlineColor = options.get("outline", "black")
-		self.isActive = options.get("isActive", True)
-		self.clicked = True
-		self.rectangle = graph.Rectangle(graph.Point(self.x, self.y), graph.Point(self.x + 1, self.y + 1))
-		self.rectangle.draw(self.master)
-		self.id = self.rectangle.id
-		self.master.tag_bind(self.id, "<Button-1>", self.click) # if clicked, call self.click
-		# if the user hovers over the cell, change the color
-		self.master.tag_bind(self.id, "<Enter>", lambda event: self.hover(True))
-		self.master.tag_bind(self.id, "<Leave>", lambda event: self.hover(False))
-		self.rectangle.setOutline(self.outlineColor)
-		self.click(force = True)
-
-	def click(self, event = None, force = False):
-		'''Simulates a cell click'''
-		if self.isActive or force:
-			self.clicked = not self.clicked
-			# if the cell is clicked, set it to the isActive color (becomes the background color otherwise)
-			self.color = self.activeColor if self.clicked else self.master.configure("background")[-1]
-			self.rectangle.setFill(self.color)
-
-	def hover(self, on, force = False):
-		'''Simulates a cell hover'''
-		if self.isActive or force:
-			color = self.hoverColor if on else self.color
-			self.rectangle.setFill(color)
 		
+	def toggle(self, cells):
+		'''Toggles the given cells on or off'''
+		if isinstance(cells[0], (list, tuple, set)):
+			for x, y in cells:
+				self.click(x, y)
+		else:
+			for cell in cells:
+				self.click(cell, 0)
+		
+	def draw(self, width, height, drawAll = True):
+		'''Draws the CAGrid'''
+		w, h = self.width / width, self.height / height
+		self.width_cells, self.height_cells = width, height
+		if w < 3 or h< 3:
+			self.outlineColor = self.background
+		if drawAll:
+			def drawCells(x):
+				for y in xrange(height):
+					self.graph.create_rectangle(x * w, y * h, (x + 1) * w, (y + 1) * h, outline = self.outlineColor)
+				self.graph.update_idletasks()
+				if x < width:
+					self.graph.after(1, lambda: drawCells(x + 1))
+			drawCells(0)
+				
+	def click(self, x, y):
+		'''Simulates a click event on a cell'''
+		w, h = self.width / self.width_cells, self.height / self.height_cells
+		x, y = (x - (x % w)) / w, (y - (y % h)) / h
+		current = self.cells.get((x, y), self.background)
+		on = current == self.background
+		new = self.activeColor if on else self.background
+		self.graph.create_rectangle(x * w, y * h, (x + 1) * w, (y + 1) * h, fill = new, outline = new if on else self.outlineColor)
+		self.cells[(x, y)] = new
+		
+	def clicked(self, convert = True):
+		'''Returns which elements have been clicked'''
+		# get the coordinates of only the clicked cells
+		points = filter(lambda item: self.cells[item] == self.activeColor, self.cells.keys())
+		if convert:
+			return map(lambda cell: self.coordinateToPoint(cell[0], cell[1]), points)
+		else:
+			return map(lambda cell: [cell[0] - 2, cell[1]- 2], points)

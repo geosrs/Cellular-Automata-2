@@ -23,24 +23,23 @@ def generateCA(window, cellspace, rules, width, height, dimension, wrap = True):
 	'''Generates the CA on the window'''
 	window.setBackground("white") # white background saves computational power (off cells are white and do not need to be plotted)
 	window.setCoords(0, 0, width, height)
-        if dimension == 1:
-                ymin, ymax = 0, width
-                minindex, maxindex = rules[0][0], rules[0][0]
-                for rule in rules: # find the minimum and maximum of all the rules
-                        for rule_item in rule:
-                                if rule_item > maxindex:
-                                        maxindex = rule_item
-                                if rule_item < minindex:
-                                        minindex = rule_item
-                # calculate the sets of rules
-                rulesets = [{'on': rule, 'off': list(set(range(minindex, maxindex+1)) - set(rule))} for rule in rules]
-                for y in reversed(range(ymin, ymax)): # starts from the top of the window and works down
-                        # print(cellspace)
-                        for x in range(len(cellspace)):
-                                if cellspace[x] == 1: # only print the "on" cells
-                                        window.plot(x, y, "black")
-                        cellspace = generateCellSpace(rulesets, cellspace, wrap)
-                        window.update() # window updates after every row
+	if dimension == 1:
+		ymin, ymax = 0, width
+		minindex, maxindex = rules[0][0], rules[0][0]
+		for rule in rules: # find the minimum and maximum of all the rules
+			for rule_item in rule:
+				if rule_item > maxindex:
+					maxindex = rule_item
+				if rule_item < minindex:
+					minindex = rule_item
+		# calculate the sets of rules
+		rulesets = [{'on': rule, 'off': list(set(xrange(minindex, maxindex+1)) - set(rule))} for rule in rules]
+		for y in reversed(xrange(ymin, ymax)): # starts from the top of the window and works down
+			for x in xrange(len(cellspace)):
+				if cellspace[x] == 1: # only print the "on" cells
+					window.plot(x, y, "black")
+			cellspace = generateCellSpace(rulesets, cellspace, wrap)
+			window.update() # window updates after every row
 
 def generateCellSpace2D(rulesets, state, wrap = False):
         '''input: rulesets is a list of lists of coordinates
@@ -50,11 +49,11 @@ def generateCellSpace2D(rulesets, state, wrap = False):
 	wrap is a boolean that states whether or not the
 	cell space is a wrapping cell space'''
         wrap_amount = len(state)
-        newstate = [[0] * wrap_amount for i in range(wrap_amount)]
+        newstate = [[0] * wrap_amount for i in xrange(wrap_amount)]
         if wrap:
-                for cell in range(wrap_amount):
+                for cell in xrange(wrap_amount):
                         for ruleset in rulesets:
-                                
+                                pass
 
 def generateCellSpace(rulesets, state, wrap = False):
 	'''input: rulesets is a list of lists of integers
@@ -66,7 +65,7 @@ def generateCellSpace(rulesets, state, wrap = False):
 	wrap_amount = len(state)
 	newstate = [0] * wrap_amount
 	if wrap:
-		for cell in range(wrap_amount):
+		for cell in xrange(wrap_amount):
 			for ruleset in rulesets:
 				# if the rule matches (on cells are on and rest are off), then turn the cell of interest on
 				if (all(state[(cell + index) % wrap_amount] == 1 for index in ruleset['on'])
@@ -74,7 +73,7 @@ def generateCellSpace(rulesets, state, wrap = False):
 						newstate[(cell + INTEREST) % wrap_amount] = 1
 						break
 	else:
-		for cell in range(wrap_amount):
+		for cell in xrange(wrap_amount):
 			for ruleset in rulesets:
 				if (all(0 < cell + index < wrap_amount - 1 and state[(cell + index)] == 1 for index in ruleset['on'])
 					and all(0 < cell + index < wrap_amount - 1 and state[(cell + index)] == 0 for index in ruleset['off'])):

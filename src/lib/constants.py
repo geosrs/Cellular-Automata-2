@@ -31,7 +31,7 @@ SETTINGS_PATH = os.path.join(DEFAULT_DIR, "settings.json")
 DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.TEXT)
 
 with open(SETTINGS_PATH, 'r') as SETTINGS_FILE:
-	SETTINGS = xml.Object(json.load(SETTINGS_FILE))
+	SETTINGS = xml.Object.fromDictionary(json.load(SETTINGS_FILE))
 
 DATABASE = sql.Database(DATABASE_PATH)
 
@@ -46,6 +46,7 @@ MAIN_PROGRAM = "Main Program"
 ABOUT = "About"
 CREDITS = "Credits"
 HISTORY = "History"
+SETTINGS_EDIT = "Settings"
 OPTIONS_SPACE = "Cell Space"
 OPTIONS_INTEREST = "Cell of Interest"
 OPTIONS_RULES =  "Rules"
@@ -54,10 +55,11 @@ DRAW = "Draw"
 ### User Options
 
 OPTIONS = xml.Object({
-	"width": 250,
-	"height": 250,
+	"width": 200,
+	"height": 200,
 	"dimension": 2,
 	"interest": 2,
+	"wrap": True,
 	"rules": [],
 	})
 
@@ -67,6 +69,12 @@ def setOption(key, value = None):
 	value = value.get() if hasattr(value, 'get') else value
 	OPTIONS[key] = value
 	return value
+
+def saveSettings(d):
+	'''Saves the settings as a new dictionary'''
+	SETTINGS = d
+	with open(SETTINGS_PATH, 'w') as SETTINGS_FILE:
+		SETTINGS_FILE.write(json.dumps(d, indent = 4).replace('    ', '\t'))
 
 ### Miscellaneous Constants
 
