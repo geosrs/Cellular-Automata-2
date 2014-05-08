@@ -25,7 +25,7 @@ class App(tk.BaseCustomWindow):
 		if SETTINGS.fullscreen:
 			self.master.fullscreen(False)
 		else:
-			self.master.geometry("{w}x{h}".format(w = int(tk.SCREENDIM['w'] * 0.66), h = int(tk.SCREENDIM['h'] * 0.66)))
+			self.master.geometry("{w}x{h}".format(w = int(tk.SCREENDIM['w'] * 0.8), h = int(tk.SCREENDIM['h'] * 0.8)))
 		self.WM = WindowManager(self.master,
 			place_options = {'anchor': tk.CENTER, 'relx': 0.5, 'rely': 0.5})
 		self.createScreens()

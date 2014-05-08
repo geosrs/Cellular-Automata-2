@@ -24,6 +24,7 @@ class CAGrid(tk.BaseCustomWidget):
 		self.graph.bind("<B1-Motion>", lambda event: self.click(event.x, event.y))
 		self.setBackground("white")
 		self.cells = {}
+		self.edit = True
 	
 	def configure(self, *args, **kwargs):
 		'''Configures the CAGrid'''
@@ -36,15 +37,15 @@ class CAGrid(tk.BaseCustomWidget):
 		
 	def coordinateToPoint(self, x, y):
 		'''Transforms the (x, y) board coordinate into a linear point'''
-		return (self.width * (y + 1) + x) - 1
+		return (self.width_cells * (y + 1) + x) - 1
 	
 	def pointToCoordinate(self, n):
 		'''Transforms the linear point into an (x, y) board coordinate'''
 		n += 1
-		x = n % self.width
-		y = n // self.width + 1
+		x = n % self.width_cells
+		y = n // self.width_cells + 1
 		if x == 0:
-			x = self.width
+			x = self.width_cells
 			y -= 1
 		return (x, y)
 		
@@ -72,15 +73,18 @@ class CAGrid(tk.BaseCustomWidget):
 					self.graph.after(1, lambda: drawCells(x + 1))
 			drawCells(0)
 				
-	def click(self, x, y):
+	def click(self, x, y, state = None):
 		'''Simulates a click event on a cell'''
-		w, h = self.width / self.width_cells, self.height / self.height_cells
-		x, y = (x - (x % w)) / w, (y - (y % h)) / h
-		current = self.cells.get((x, y), self.background)
-		on = current == self.background
-		new = self.activeColor if on else self.background
-		self.graph.create_rectangle(x * w, y * h, (x + 1) * w, (y + 1) * h, fill = new, outline = new if on else self.outlineColor)
-		self.cells[(x, y)] = new
+		if self.edit:
+			w, h = self.width / self.width_cells, self.height / self.height_cells
+			x, y = (x - (x % w)) / w, (y - (y % h)) / h
+			current = self.cells.get((x, y), self.background)
+			on = current == self.background
+			if not state is None:
+				on = state
+			new = self.activeColor if on else self.background
+			self.graph.create_rectangle(x * w, y * h, (x + 1) * w, (y + 1) * h, fill = new, outline = new if on else self.outlineColor)
+			self.cells[(x, y)] = new
 		
 	def clicked(self, convert = True):
 		'''Returns which elements have been clicked'''
@@ -89,4 +93,4 @@ class CAGrid(tk.BaseCustomWidget):
 		if convert:
 			return map(lambda cell: self.coordinateToPoint(cell[0], cell[1]), points)
 		else:
-			return map(lambda cell: [cell[0] - 2, cell[1]- 2], points)
+			return points

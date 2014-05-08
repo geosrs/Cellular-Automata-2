@@ -1,15 +1,16 @@
 <data>
 	<!-- Any changes here will carry throughout the entire project -->
 	<title>Cellular Automata</title>
-	<authors>Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee</authors>
+	<authors>Rushy Panchal, George Georges, and Krish Pamani</authors>
 	<copyright>Copyright Rushy Panchal et al. 2014</copyright>
 	<credits>
-		Created by Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, and Allan Lee.
+		Created by Rushy Panchal, George Georges, and Krish Pamani.
 
 		Copyright 2014.
 	</credits>
 	<about>
 		<!-- About Text Goes Here -->
+		Test about
 	</about>
 	<options>
 		<width>This is the width (in rows) of the Cellular Automata grid.</width>

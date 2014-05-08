@@ -55,8 +55,8 @@ DRAW = "Draw"
 ### User Options
 
 OPTIONS = xml.Object({
-	"width": 200,
-	"height": 200,
+	"width": 400,
+	"height": 400,
 	"dimension": 2,
 	"interest": 2,
 	"wrap": True,
