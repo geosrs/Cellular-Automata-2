@@ -328,7 +328,8 @@ class Options_InterestScreen(Screen):
 	def setOptions(self):
 		'''Sets the global options'''
 		clicked =  self.caGrid.clicked()
-		setOption("interest", clicked[0]-2 if clicked else OPTIONS.interest)
+		shift = -6 if OPTIONS.dimension == 1 else 0
+		setOption("interest", clicked[0] + shift if clicked else OPTIONS.interest)
 		return True
 
 	def onload(self):
@@ -371,7 +372,7 @@ class Options_RuleScreen(Screen):
 		self.rules[self.currentRule] = newRuleFrame
 		newRuleFrame.number = self.currentRule
 		ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = self.currentRule), style = "OptionHeader.TLabel")
-		ruleGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+		ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 		ruleGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		newRuleFrame.ca_grid = ruleGrid
 
@@ -444,17 +445,24 @@ class DrawScreen(Screen):
 			self.drawButton.configure(state = tk.DISABLED)
 			cellspace = [0] * OPTIONS.width
 			self.graph.setCoords(0, 0, OPTIONS.width, OPTIONS.height)
-			for x, y in start:
+			for x, y in filter(lambda cell: cell[1] <= 1, start):
 				try:
-					cellspace[x] = 1
+					cellspace[x - 40] = 1
+					print x
 				except IndexError:
 					pass
 			rulesets = [{'on': rule, 'off': list(set(xrange(-2, 3)) - set(rule))} for rule in OPTIONS.rules]
-			ymin, ymax = 0, OPTIONS.width
+			ymin, ymax = 0, OPTIONS.height
+			print rulesets, OPTIONS.interest
 			while True:
 				for y in reversed(xrange(ymin, ymax)): # starts from the top of the window and works down
+					# erase current row
+					r = graph.Rectangle(graph.Point(0, y), graph.Point(SETTINGS.width, y - 1))
+					r.setFill("white")
+					r.setOutline("white")
+					r.draw(self.graph) # not drawing correctly
 					for x in xrange(len(cellspace)):
-						if cellspace[x] == 1: # only show the "on" cells
+						if cellspace[x] == 1:
 							self.graph.plot(x, y, "black")
 					cellspace = self.generateCellSpace1D(rulesets, cellspace, True)
 					self.graph.update() # window updates after every row
