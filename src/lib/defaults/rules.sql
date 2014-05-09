@@ -6,5 +6,4 @@ CREATE TABLE history (
 	rule		VARCHAR(255)		NOT NULL 	DEFAULT 	'',
 	image		VARCHAR(255)		NOT NULL 	DEFAULT 	''
 	);
-
-CREATE TABLE examples AS SELECT * FROM history WHERE 0;
+ 	

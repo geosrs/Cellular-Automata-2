@@ -86,6 +86,11 @@ class CAGrid(tk.BaseCustomWidget):
 			self.graph.create_rectangle(x * w, y * h, (x + 1) * w, (y + 1) * h, fill = new, outline = new if on else self.outlineColor)
 			self.cells[(x, y)] = new
 		
+	def clickCell(self, x, y, state = None):
+		'''Clicks a specific cell'''
+		if self.edit:
+			self.click(x * self.width / self.width_cells, y * self.height / self.height_cells, state)
+
 	def clicked(self, convert = True):
 		'''Returns which elements have been clicked'''
 		# get the coordinates of only the clicked cells

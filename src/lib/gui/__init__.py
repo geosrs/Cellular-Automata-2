@@ -22,6 +22,7 @@ class App(tk.BaseCustomWindow):
 		self.master = master
 		self.master.cleanup = DATABASE.close
 		self.master.title(NAME)
+		self.master.protocol("WM_DELETE_WINDOW", self.master.close)
 		if SETTINGS.fullscreen:
 			self.master.fullscreen(False)
 		else:

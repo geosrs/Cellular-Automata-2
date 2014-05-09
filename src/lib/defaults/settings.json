@@ -1,7 +1,8 @@
 {
 	"height": 500, 
 	"width": 500, 
-	"font": "Century Gothic", 
+	"font": "Century Gothic",
+	"size": 12,
 	"initial": true, 
 	"fullscreen": false
 }

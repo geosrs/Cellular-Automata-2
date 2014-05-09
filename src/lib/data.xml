@@ -1,16 +1,16 @@
 <data>
 	<!-- Any changes here will carry throughout the entire project -->
-	<title>Cellular Automata</title>
+	<title>Chaos Automata</title>
 	<authors>Rushy Panchal, George Georges, and Krish Pamani</authors>
-	<copyright>Copyright Rushy Panchal and George Georges 2014</copyright>
+	<copyright>&#169; <!--Copyright Symbol --> Rushy Panchal and George Georges 2014.</copyright>
 	<credits>
 		Created by Rushy Panchal, George Georges, and Krish Pamani.
 
-		Copyright 2014.
+					Copyright 2014.
 	</credits>
 	<about>
 		<!-- About Text Goes Here -->
-		Test about
+		INSERT ABOUT TEXT HERE
 	</about>
 	<options>
 		<width>This is the width (in rows) of the Cellular Automata grid.</width>

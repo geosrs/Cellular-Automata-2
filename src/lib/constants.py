@@ -18,20 +18,22 @@ SETUP_STATUS = setup.run() # set up the program files
 CUR_DIR = os.getcwd()
 USER_DIR = os.path.join(CUR_DIR, "user")
 LIB_DIR = os.path.join(CUR_DIR, "lib")
+IMAGES_DIR = os.path.join(CUR_DIR, "img")
 DEFAULT_DIR = os.path.join(LIB_DIR, "defaults")
 
 DATA_PATH = os.path.join(LIB_DIR, "data.xml")
 SETTINGS_PATH = os.path.join(USER_DIR, "settings.json")
+DEFAULT_SETTINGS_PATH = os.path.join(DEFAULT_DIR, "settings.json")
 DATABASE_PATH = os.path.join(USER_DIR, "rules.db")
-
-# Remove once testing is done
-SETTINGS_PATH = os.path.join(DEFAULT_DIR, "settings.json")
+IMAGE_PATHS = {name: os.path.join(IMAGES_DIR, name) for name in os.listdir(IMAGES_DIR)}
 
 # retrieve data from the various files
 DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.TEXT)
 
 with open(SETTINGS_PATH, 'r') as SETTINGS_FILE:
 	SETTINGS = xml.Object.fromDictionary(json.load(SETTINGS_FILE))
+with open(DEFAULT_SETTINGS_PATH, 'r') as DEFAULT_FILE:
+	DEFAULT_SETTINGS = xml.Object.fromDictionary(json.load(DEFAULT_FILE))
 
 DATABASE = sql.Database(DATABASE_PATH)
 
@@ -57,7 +59,7 @@ DRAW = "Draw"
 OPTIONS = xml.Object({
 	"width": 400,
 	"height": 400,
-	"dimension": 2,
+	"dimension": 1,
 	"interest": 2,
 	"wrap": True,
 	"rules": [],

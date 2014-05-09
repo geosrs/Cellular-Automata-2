@@ -11,16 +11,18 @@ from lib.constants import *
 
 ### Other Constants
 
-def initializeStyles(window):
+def initializeStyles(window, size = None):
 	'''Initializes the styles for the window'''
 	global STYLES
 	BASE_FONT = SETTINGS.font
-	STYLES = tk.createBaseStyles(window, (BASE_FONT, 12)) # create the base styles
+	if not size:
+		size = SETTINGS.size
+	STYLES = tk.createBaseStyles(window, (BASE_FONT, size)) # create the base styles
 	# other styles
 	tk.configureStyle(STYLES["Label"], "Header.TLabel", foreground = "red",
-		font = (BASE_FONT, 20))
+		font = (BASE_FONT, size + 8))
 	tk.configureStyle(STYLES["Label"], "Subheader.TLabel", foreground = "blue",
-		font = (BASE_FONT, 16))
+		font = (BASE_FONT, size + 4))
 	tk.configureStyle(STYLES["Label"], "OptionHeader.TLabel", foreground = "purple",
-		font = (BASE_FONT, 14))
+		font = (BASE_FONT, size + 2))
 	
