@@ -8,10 +8,10 @@ HEIGHT = 401
 INTEREST = 0
 WRAP = True
 TOTALISTIC = True
-DIMENSION = 1
-#RULES = [[[1,2],[-1,0]], [[0,0],[0,2]], [[-1,-2],[1,-1]]]
+DIMENSION = 2
+#RULES = [[[1,2]], [[0,0]], [[1,-1]], [[5, 4]], [[3, 1], [0,0]]]
 #RULES = [[-1], [0], [1]]
-RULES = [[0], [1]]
+RULES = [[1], [2]]
 #CELLSPACE = [0] * WIDTH
 CELLSPACE = [[0] * WIDTH for i in range(HEIGHT)]
 #CELLSPACE[int(WIDTH/2)] = 1 # set the center cell to 1
@@ -20,8 +20,6 @@ CELLSPACE[int(WIDTH/2)][int(HEIGHT/2)] = 1
 def main():
 	CA = GraphWin(None, WIDTH, HEIGHT, autoflush = False) # this is to run with Tkinter
 	CA.grid()
-	# CA = GraphWin("Cellular Automata", WIDTH, HEIGHT, autoflush = False)
-	#generateCellSpace2D(RULES, CELLSPACE)
 	generateCA(CA, CELLSPACE, RULES, WIDTH, HEIGHT, DIMENSION, WRAP, TOTALISTIC)
 
 def generateCA(window, cellspace, rules, width, height, dimension, wrap = True, totalistic = False):
@@ -58,12 +56,13 @@ def generateCA(window, cellspace, rules, width, height, dimension, wrap = True, 
 			ymin, ymax = 0, height
 			xmin, xmax = 0, width
 			# calculate the sets of rules, neighborhood restricted to 5x5 grid
-			all_row_cells = set(range(-2, 3))
-			rulesets = [{'on': rule, 'off': [list(all_row_cells - set(row)) for row in rule]} for rule in rules]
-			for y in reversed(range(ymin, ymax)):
-				for x in range(xmin, xmax):
-					if cellspace[x][y] == 1: # only print the "on" cells
-						window.plot(x, y, "black")
+			# all_row_cells = set(range(-2, 3))
+			rulesets = [{'on': rule} for rule in rules]
+			for i in range(10):
+				for y in reversed(range(ymin, ymax)):
+					for x in range(xmin, xmax):
+						if cellspace[x][y] == 1: # only print the "on" cells
+							window.plot(x, y, "black")
 				cellspace = generateCellSpace2D(rulesets, cellspace, wrap, False)
 				window.update()
 	elif dimension == 1 and totalistic == True:
@@ -78,12 +77,12 @@ def generateCA(window, cellspace, rules, width, height, dimension, wrap = True, 
 	elif dimension == 2 and totalistic == True:
 			ymin, ymax = 0, height
 			xmin, xmax  = 0, width
-			print(rules)
 			rulesets = [{'on': rule, 'off': [list(set(range(0, 10)) - set(rule))]} for rule in rules]
-			for y in reversed(range(ymin, ymax)):
-				for x in range(xmin, xmax):
-					if cellspace[x][y] == 1:
-						window.plot(x, y, "black")
+			for i in range(100):
+				for y in reversed(range(ymin, ymax)):
+					for x in range(xmin, xmax):
+						if cellspace[x][y] == 1:
+							window.plot(x, y, "black")
 				cellspace = generateCellSpace2D(rulesets, cellspace, wrap, True)
 				window.update()
 
@@ -102,7 +101,7 @@ def generateCellSpace2D(rulesets, state, wrap = False, totalistic = False):
 				for row in range(wrap_amount):
 					for ruleset in rulesets:
 							#  if the rule matches (on cells are on and rest are off), then turn the cell of interest on
-						if all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 1 for index in ruleset['on']) and all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 0 for index in ruleset['off']):
+						if all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 1 for index in ruleset['on']): #and all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 0 for index in ruleset['off']):
 							newstate[(cell % wrap_amount)][(row % wrap_amount)] = 1
 							break
 		else:
