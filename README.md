@@ -3,27 +3,6 @@ Cellular-Automata
 
 Nonlinear Dynamics Cellular Automata Project 2014
 
-Current Tasks:
- - Krish: Interface design
- - Rushy: Interface creation
- - George: Create 2D CA test program
- - Naomi: Convert George's 1D CA program to use classes/Cython
- - Allan: Work on description of CA for "About CA" screen
+Created by Rushy Panchal, George Georges, and Krish Pamani.
 
-Also, we need a standardized indentation (at least with Python).
-I use tabs, or you can use 4 spaces. Those are general standards, so stick with one or the either.
- 
-Notes on Commits:
-
- - Create a new commit for any change (so we have a running record of changes)
- - Add a decent comment for each commit (so we know what is being changed)
- - Don't commit to a file that someone is still working on (might override some changes)
-
-
-For any window to work with the main interface, it should be in this format:
-
-	class WindowName(tk.BaseCustomWindow):
-		def __init__(self, master):
-			self.master
-
-WindowName is your window name, and tk is my library (see https://github.com/panchr/Python-Tkinter-Extensions)
+Licensed under the General Public License (GPL) v3.0.

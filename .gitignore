@@ -216,4 +216,7 @@ pip-log.txt
 
 # Custom Ignores
 src/user/
+src/tk/
+src/pysqlite.py
+src/xmlparse.py
 etc
