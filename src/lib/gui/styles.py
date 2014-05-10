@@ -25,4 +25,6 @@ def initializeStyles(window, size = None):
 		font = (BASE_FONT, size + 4))
 	tk.configureStyle(STYLES["Label"], "OptionHeader.TLabel", foreground = "purple",
 		font = (BASE_FONT, size + 2))
+	tk.configureStyle(STYLES["Label"], "Help.TLabel", foreground = "darkgreen",
+		font = (BASE_FONT, size))
 	

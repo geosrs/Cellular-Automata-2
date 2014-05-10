@@ -20,7 +20,7 @@ class App(tk.BaseCustomWindow):
 	'''Main application'''
 	def __init__(self, master):
 		self.master = master
-		self.master.cleanup = DATABASE.close
+		self.master.cleanup = self.cleanup
 		self.master.title(NAME)
 		self.master.protocol("WM_DELETE_WINDOW", self.master.close)
 		if SETTINGS.fullscreen:
@@ -33,6 +33,12 @@ class App(tk.BaseCustomWindow):
 		self.WM.open(START)
 		self.copyrightLabel = tk.Label(self.master, text = DATA.copyright.text)
 		self.copyrightLabel.place(anchor = tk.S, relx = 0.5, rely = 1)
+
+	def cleanup(self):
+		'''Cleans up the program before closing'''
+		# reindex the database to show new records
+		# DATABASE.query("ALTER TABLE history AD")
+		DATABASE.close()
 
 	def createScreens(self):
 		'''Creates all of the screens'''

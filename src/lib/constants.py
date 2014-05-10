@@ -40,6 +40,7 @@ DATABASE = sql.Database(DATABASE_PATH)
 ### Supplementary constants
 
 NAME = DATA.title.text
+HELP = DATA.help
 
 ### Window-managing constants --- they identify the various windows
 

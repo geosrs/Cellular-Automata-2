@@ -11,12 +11,81 @@
 	<about>
 		<!-- About Text Goes Here -->
 		INSERT ABOUT TEXT HERE
+		What is Cellular Automata?
+		•	A cellular automata is a grid of cells. Each cell is defined by its state.
+		•	States
+		•	 The state of a cell can be as simple as either on or off, or it can be one of hundreds of choices.
+		•	The cell state is determined by a set of rules.
+		•	Rules
+		•	The rules are a list of requirements that the cell must meet in order to be a certain state.
+		•	Cell of interest
+		•	 The cell of interest is any cell that the program is examining at the time. Each cell of interest has a neighborhood.
+		•	The neighborhood
+		•	 The cells surrounding the cell of interest is called the neighborhood. The neighborhood cell’s states are what determine the cell of interest's state. 
+		Behavior 
+		•	The cellular automata normally starts with all of the cells set to a pre decided state.
+		•	The computer analyzes all of the cell to determine their new state. Every time the grid is analyzed it is called a generation 
+		•	These generations are shown one after another creating a moving pattern on the screen. 
+		Totalistic cellular automata
+		•	The rules for the cell of interest depend only on the total or average of the neighborhood cell states. The order in which the states are presented does not matter.
+		Non totalistic cellular automata 
+		•	The rules for the cell of interest depend on a specific arrangement of states in the neighboring cells.
+		Dimensions 
+		•	The 2D cellular automata is shown on a 2D grid it looks like:
+		 
+
+		•	The 1D cellular automata is displayed by showing how the generations change generation by generation. It looks like this:
+		 
+
+
+		Our program 
+		1D cellular automata 
+		•	Totalistic – the neighborhood is restricted to the neighboring cells of the cell of interest 
+		•	Non totalistic - the neighborhood is not restricted
+
+		2D cellular automata 
+		•	Totalistic – the cellular automata is restricted to a 3X3 grid
+		•	Non totalistic – the cellular automata is restricted to a 5X5 grid
+		•	
+		History of cellular automata 
+		•	Cellular Automata have their origin in systems described by John Von Neumann and Stanislaw Marcin Ulam
+		•	Cellular Automaton was discovered trying to replicate an abstract model of self-reproduction in biology.
+		•	During the 1960s, people had whimsical discussion of building actual self-reproducing automata. 
+		Wolfram neighborhood
+		•	It is one of the simplest one dimensional cellular automata.
+		•	There are 28=256 elementary cellular automata, because it uses a 8 digit binary system.
+		•	The picture on the bottom left are the basic 8 rules for the wolfram neighborhood.  
+		 
+		•	There are 256 rules for the Wolfram Neighborhood. 
+		•	Ex. 000111102 = 2+4+8+16 = 30, so this would be a rule 30 cellular automaton
+		•	When this rule is iterated, it would look like this
+
+ 
+
 	</about>
-	<options>
-		<width>This is the width (in rows) of the Cellular Automata grid.</width>
-		<height>This is the height (in columns) of the Cellular Automata grid.
-		Set it to 1 for 1-Dimensional Automata.</height>
-		<interest>This cell, the cell of interest, is turned on if a rule matches a pattern.</interest>
-		<rules>The Cellular Automata rules dictate which cells to turn on. If any pattern is matched for a specified Cell of Interest, then that cell is turned on.</rules>
-	</options>
+	<help>
+		<settings>
+			The width and height is the size of the Cellular Automata grids (in pixels).
+			The program font and font size can also be changed, as well as fullscreen mode.
+		</settings>
+		<history>
+			The user history is a record of all the previous automata run.
+			By clicking on an automaton's number, more detailed information can be viewed about it.
+			In addition, any history record can be deleted, or every item can be deleted using the "Clear" button.
+		</history>
+		<cellspace>
+			The cellspace is the entire grid of cells.
+			It can be 1 or 2 dimensional, and has a "wrap" mode. if wrap is enabled, the edges will wrap around to the other side.
+		</cellspace>
+		<interest>
+			 The Cell of Interest is the cell that is turned on when a particular rule pattern is matched.
+			 Generally, this is the center cell in the neighborhood, but it can be anything.
+		</interest>
+		<rules>
+			Rules are specific patterns that have to be matched.
+			For 1-dimensional Cellular Automata, the cell of interest is turned to the "on" state only if the rule matches exactly.
+
+			For 2-dimensional Automata, the cell of interest is turned on if the number of adjacent cells matches the amount of selected cells.
+		</rules>
+	</help>
 </data>

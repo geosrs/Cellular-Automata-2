@@ -92,6 +92,7 @@ class RuleDisplay(tk.Frame):
 		column = number % self.width
 		if column == 0:
 			column = self.width
+		# add the button to the grid of buttons
 		ruleButton.grid(row = int((number - 1) / self.width), column = column, padx = 5, pady = 5)
 
 ### Main display screens
@@ -159,15 +160,23 @@ class HistoryScreen(Screen):
 		self.displayed = []
 
 		self.mainLabel = tk.Label(self, text = "History", style = "Subheader.TLabel")
+		self.helpLabel = tk.Label(self, text = HELP.history.text, style = "Help.TLabel")
 		self.searchLabel = tk.Label(self, text = "Search")
 		self.searchEntry = tk.Entry(self, justify = tk.CENTER, command = self.filter)
 		self.historyFrame = tk.Frame(self)
+		self.clearButton = tk.Button(self, text = "Clear", command = self.clear, style = "Quit.TButton")
+		self.prevRowsButton = tk.Button(self, text = "Previous", command = lambda: self.next(-10))
+		self.nextRowsButton = tk.Button(self, text = "Next", command = lambda: self.next(10))
 		self.addNavigator(prev = "Home")
+		self.current_rows = (0, 10)
 
 		self.gridWidgets([
 			self.mainLabel,
+			self.helpLabel,
 			# (self.searchLabel, self.searchEntry),
 			self.historyFrame,
+			self.clearButton,
+			(self.prevRowsButton, self.nextRowsButton),
 			self.prevButton,
 			], padx = 5, pady = 5)
 
@@ -175,13 +184,32 @@ class HistoryScreen(Screen):
 		'''Filters the history'''
 		pass # not implemented yet
 
+	def clear(self):
+		"""Clears all the history"""
+		self.db.delete("history", where = "1 = 1")
+		self.displayRows(*self.current_rows)
+
 	def onload(self):
 		'''Loads the latest rows'''
-		self.displayRows() # show the ten most recent rules
+		self.displayRows(*self.current_rows) # show the ten most recent rules
+		self.nextRowsButton.configure(state = tk.NORMAL)
+		self.prevRowsButton.configure(state = tk.NORMAL)
+
+	def next(self, delta = 10):
+		'''Displays the next/previous "delta" rows'''
+		total_rows_cursor = self.db.select("row_count", where = "1 = 1")
+		num_rows = self.db.fetch(total_rows_cursor)[0]["amount"]
+		new_rows = map(lambda x: x + delta, self.current_rows)
+
+		if new_rows[0] < num_rows and new_rows[1] <= num_rows:
+			self.displayRows(*new_rows)
+		self.prevRowsButton.configure(state = tk.DISABLED if new_rows[0] - abs(delta) < 0 else tk.NORMAL)	
+		self.nextRowsButton.configure(state = tk.DISABLED if new_rows[1] + abs(delta) > num_rows else tk.NORMAL)
 
 	def displayRows(self, start = 0, end = 10):
 		'''Displays the rows from "start" to "end"'''
 		# fetch the rows
+		self.current_rows = (start, end)
 		row_cursor = self.db.query(self.baseQuery.format(limit = end - start, offset = start))
 		rows = self.db.fetch(row_cursor)
 		# remove the previous rows
@@ -206,10 +234,10 @@ class HistoryScreen(Screen):
 		rules = literal_eval(data["rule"])
 		rowWindow = tk.Toplevel(self.master)
 		data_time = datetime.strptime(data["time"], "%Y-%m-%d %H:%M:%S")
-		time_created = data_time.strftime("%B %d, %Y at %H:%M:%S")
+		time_created = data_time.strftime("%B %d, %Y at %H:%M:%S") # format the time to display
 
 		# display the associated data
-		ruleNumber = tk.Label(rowWindow, text = "Automata {n}".format(n = number), style = "Subheader.TLabel")
+		ruleNumber = tk.Label(rowWindow, text = "Automaton {n}".format(n = number), style = "Subheader.TLabel")
 		timeDesc = tk.Label(rowWindow, text = "Time Created", style = "OptionHeader.TLabel")
 		timeLabel = tk.Label(rowWindow, text = time_created)
 		dimensionDesc = tk.Label(rowWindow, text = "Dimensions", style = "OptionHeader.TLabel")
@@ -225,12 +253,12 @@ class HistoryScreen(Screen):
 			ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = n), style = "OptionHeader.TLabel")
 			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if dimension == 1 else SETTINGS.height / 2)
 			ruleGrid.draw(5, 1 if dimension == 1 else 5)
-			if dimension == 1:
+			if dimension == 1: # show the current cells
 				for x in rule:
 					ruleGrid.clickCell(x + 2, 0)
 			else:
 				for x, y in rule:
-					ruleGrid.click(x + 2, y + 2)
+					ruleGrid.clickCell(x + 2, y + 2)
 			ruleGrid.edit = False
 			newRuleFrame.ca_grid = ruleGrid
 
@@ -242,7 +270,13 @@ class HistoryScreen(Screen):
 
 		ruleFrame.click(1) # select the first rule to show as default
 
-		closeButton = tk.Button(rowWindow, text = "Close", command = rowWindow.close, style = 'Quit.TButton')
+		def deleteItem():
+			self.db.delete("history", equal = {"rule_number": number})
+			rowWindow.close()
+			self.displayRows(*self.current_rows)
+
+		delButton = tk.Button(rowWindow, text = "Delete", command = deleteItem, style = "Quit.TButton")
+		closeButton = tk.Button(rowWindow, text = "Close", command = rowWindow.close)
 
 		rowWindow.gridWidgets([
 			ruleNumber,
@@ -250,6 +284,7 @@ class HistoryScreen(Screen):
 			(dimensionDesc, dimensionLabel),
 			(interestDesc, interestLabel),
 			ruleFrame,
+			delButton,
 			closeButton
 			], padx = 5, pady = 5)
 
@@ -286,8 +321,7 @@ class SettingsScreen(Screen):
 		self.fullscreenVar = tk.IntVar(self)
 		self.fullscreenVar.set(SETTINGS.fullscreen)
 		self.fullscreenOption = tk.Checkbutton(self, text = "Fullscreen", variable = self.fullscreenVar)
-		self.sizeLabel = tk.Label(self, text = "Font Size", style = "OptionHeader.TLabel")
-		self.sizeSlider = tk.LabelledScale(self, type = int, from_ = 8, to = 24, length = 250, default = SETTINGS.size, step = 1, edit = True)
+		self.helpLabel = tk.Label(self, text = HELP.settings.text, style = "Help.TLabel")
 		self.widthLabel = tk.Label(self, text = "Width", style = "OptionHeader.TLabel")
 		self.widthSlider = tk.LabelledScale(self, type = int, from_ = 1, to = tk.SCREENDIM["width"],
 			length = 250, default = SETTINGS.width, step = 2, edit = True)
@@ -297,12 +331,15 @@ class SettingsScreen(Screen):
 		self.fontLabel = tk.Label(self, text = "Program Font", style = "OptionHeader.TLabel")
 		self.fontEntry = tk.Entry(self, width = 20, justify = tk.CENTER)
 		self.fontEntry.insert(tk.END, SETTINGS.font)
+		self.sizeLabel = tk.Label(self, text = "Font Size", style = "OptionHeader.TLabel")
+		self.sizeSlider = tk.LabelledScale(self, type = int, from_ = 8, to = 24, length = 250, default = SETTINGS.size, step = 1, edit = True)
 		self.saveButton = tk.Button(self, text = "Apply", command = self.saveSettings)
 		self.defaultButton = tk.Button(self, text = "Reset to Default", command = self.loadDefaults, style = "Quit.TButton")
 		self.addNavigator()
 
 		self.gridWidgets([
 			self.mainLabel,
+			self.helpLabel,
 			self.fullscreenOption,
 			(self.fontLabel, self.fontEntry),
 			(self.sizeLabel, self.sizeSlider),
@@ -372,24 +409,33 @@ class Options_CellspaceScreen(Screen):
 	def createInterface(self):
 		'''Creates the interface for the Cellspace Options window'''
 		self.mainLabel = tk.Label(self, text = "Cellspace", style = "Subheader.TLabel")
+		self.helpLabel = tk.Label(self, text = HELP.cellspace.text, style = "Help.TLabel")
 		self.dimensionVar = tk.IntVar(self)
 		self.dimensionVar.set(OPTIONS.dimension)
-		# disable the height slider if 1D is selected
+		self.wrapVar = tk.IntVar(self)
+		self.wrapVar.set(OPTIONS.wrap)
+
 		self.dim1D = tk.Radiobutton(self, text = "1 Dimensional", value = 1,
 			variable = self.dimensionVar)
 		self.dim2D = tk.Radiobutton(self, text = "2 Dimensional", value = 2,
-			variable = self.dimensionVar, state = tk.DISABLED)
+			variable = self.dimensionVar)
+
+		self.wrapOption = tk.Checkbutton(self, text = "Wrap", variable = self.wrapVar)
+
 		self.addNavigator()
 
 		self.gridWidgets([
 			self.mainLabel,
+			self.helpLabel,
 			(self.dim1D, self.dim2D),
+			self.wrapOption,
 			(self.prevButton, self.nextButton)
 			], pady = 5)
 
 	def setOptions(self, again = False):
 		'''Sets the global options'''
 		setOption("dimension", self.dimensionVar.get())
+		setOption("wrap", bool(self.wrapVar.get()))
 		return True
 
 class Options_InterestScreen(Screen):
@@ -401,6 +447,7 @@ class Options_InterestScreen(Screen):
 	def createInterface(self):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
+		self.helpLabel = tk.Label(self, text = HELP.interest.text, style = "Help.TLabel")
 		self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 		self.caGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		self.caGrid.toggle([0, 2]) # toggle the first cell as default
@@ -408,15 +455,18 @@ class Options_InterestScreen(Screen):
 
 		self.gridWidgets([
 			self.mainLabel,
+			self.helpLabel,
 			self.caGrid,
 			(self.prevButton, self.nextButton),
 			], pady = 5)
 
 	def setOptions(self):
 		'''Sets the global options'''
-		clicked =  self.caGrid.clicked()
-		shift = -6 if OPTIONS.dimension == 1 else 0
-		setOption("interest", clicked[0] + shift if clicked else OPTIONS.interest)
+		clicked =  self.caGrid.clicked() if OPTIONS.dimension == 1 else self.caGrid.clicked(False)
+		if clicked:
+			clicked = clicked[0]
+		shift = -6 if OPTIONS.dimension == 1 else -2
+		setOption("interest", (clicked + shift if OPTIONS.dimension == 1 else map(lambda x: x + shift, clicked)) if clicked else OPTIONS.interest)
 		return True
 
 	def onload(self):
@@ -426,7 +476,7 @@ class Options_InterestScreen(Screen):
 			# dimension changed --- create a new CAGrid
 			self.caGrid.mainFrame.grid_remove()
 			self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
-			self.caGrid.grid(row = 2, padx = 5, pady = 5, columnspan = 3)
+			self.caGrid.grid(row = 3, padx = 5, pady = 5, columnspan = 3)
 			self.caGrid.draw(5, newHeight)
 			self.caGrid.toggle([(0, 2)])
 		return True
@@ -442,12 +492,14 @@ class Options_RuleScreen(Screen):
 		self.currentRule = 1
 		self.rules = {}
 		self.mainLabel = tk.Label(self, text = "Rules", style = "Subheader.TLabel")
+		self.helpLabel = tk.Label(self, text = HELP.rules.text, style = "Help.TLabel")
 		self.ruleFrame = RuleDisplay(self, 5)
 		self.addRuleButton = tk.Button(self, text = "Add Rule", command = self.addRule)
 		self.addNavigator()
 
 		self.gridWidgets([
 			self.mainLabel,
+			self.helpLabel,
 			self.ruleFrame,
 			self.addRuleButton,
 			(self.prevButton, self.nextButton),
@@ -468,6 +520,7 @@ class Options_RuleScreen(Screen):
 			ruleLabel,
 			ruleGrid,
 			], pady = 5)
+
 		self.ruleFrame.addRule(self.currentRule, newRuleFrame)
 		self.currentRule += 1
 
@@ -487,10 +540,10 @@ class Options_RuleScreen(Screen):
 	def setOptions(self):
 		'''Sets  the global options'''
 		rules = []
-		for rule_grid in self.rules.values():
+		for rule_grid in self.rules.values(): # add the rules to the global options
 			rule_list = rule_grid.ca_grid.clicked(False)
 			if rule_list:
-				rules.append([x[0] - 2 for x in rule_list])
+				rules.append([x[0] - 2 for x in rule_list] if OPTIONS.dimension == 1 else [(x - 2, y - 2) for x, y in rule_list])
 		setOption("rules", rules)
 		return True
 
@@ -531,7 +584,7 @@ class DrawScreen(Screen):
 		'''Draws the Cellular Automata screen'''
 		# add the latest rules to the history database
 		if OPTIONS.rules:
-			DATABASE.insert("history", dimension = OPTIONS.dimension, interest = OPTIONS.interest,
+			DATABASE.insert("history", dimension = OPTIONS.dimension, interest = str(OPTIONS.interest),
 				rule = str(OPTIONS.rules))
 		if self.graph.getHeight() != SETTINGS.height or self.graph.getWidth() != SETTINGS.width:
 			# width or height settings changed
@@ -547,12 +600,13 @@ class DrawScreen(Screen):
 			ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = n), style = "OptionHeader.TLabel")
 			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 			ruleGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
+			# show the current cells
 			if OPTIONS.dimension == 1:
 				for x in rule:
 					ruleGrid.clickCell(x + 2, 0)
 			else:
 				for x, y in rule:
-					ruleGrid.click(x + 2, y + 2)
+					ruleGrid.clickCell(x + 2, y + 2)
 			ruleGrid.edit = False
 			newRuleFrame.ca_grid = ruleGrid
 
@@ -560,6 +614,7 @@ class DrawScreen(Screen):
 				ruleLabel,
 				ruleGrid,
 				], pady = 5)
+
 			self.ruleFrame.addRule(n, newRuleFrame)
 		self.ruleFrame.click(1)
 
@@ -570,9 +625,10 @@ class DrawScreen(Screen):
 		self.ca_grid.mainFrame.grid_remove()
 		self.graph.grid()
 		self.drawButton.configure(text = "Pause" if self.drawing else "Draw")
-		if OPTIONS.dimension == 1 and self.drawing:
-			self.graph.setCoords(0, 0, OPTIONS.width, OPTIONS.height)
-
+		if not self.drawing: # exit the program if not drawing
+			return False
+		self.graph.setCoords(0, 0, OPTIONS.width, OPTIONS.height)
+		if OPTIONS.dimension == 1:
 			try:
 				self.cellspace
 			except AttributeError:
@@ -587,9 +643,9 @@ class DrawScreen(Screen):
 			except AttributeError:
 				self.start_row = OPTIONS.height
 			# generate the list of rulesets
-			rulesets = [{'on': rule, 'off': list(set(xrange(-2, 3)) - set(rule))} for rule in OPTIONS.rules]
+			all_rule_ranges = set(xrange(-2, 3))
+			rulesets = [{'on': rule, 'off': list(all_rule_ranges - set(rule))} for rule in OPTIONS.rules]
 			ymin, ymax = 0, OPTIONS.height
-			print rulesets, OPTIONS.interest
 			while self.drawing:
 				# keeps drawing the cellular automata
 				for y in reversed(xrange(ymin, self.start_row)): # starts from the top of the window and works down
@@ -601,15 +657,34 @@ class DrawScreen(Screen):
 						# plot the "on" cells
 						if self.cellspace[x] == 1:
 							self.graph.plot(x, y, "black")
-					self.cellspace = self.generateCellspace1D(rulesets, self.cellspace, True)
+					self.cellspace = self.generateCellspace1D(rulesets, self.cellspace, OPTIONS.wrap)
 					self.graph.update() # window updates after every row
 					if not self.drawing:
 						self.start_row = y # pause the drawing, and save the current row
 						break
 				if self.drawing:
 					self.start_row = ymax # reset the current row
+		else: # need to draw 2D --- only need lengths of the rules, not the rules themselves
+			try:
+				self.cellspace
+			except AttributeError:
+				self.cellspace = [[0] * SETTINGS.width for i in xrange(SETTINGS.height)]
+				for x, y in start: # set the initial cellstate
+					self.cellspace[x - SETTINGS.width / 10][-y] = 1
+			# generate the rulesets
+			all_rule_ranges = set(xrange(0, 10))
+			rulesets = [{'on': [len(rule)], 'off': [list(all_rule_ranges - set(rule))]} for rule in OPTIONS.rules]
+			ymin, ymax = 0, OPTIONS.height
+			xmin, xmax  = 0, OPTIONS.width
+			while self.drawing:
+				for y in reversed(xrange(ymin, ymax)):
+					for x in xrange(xmin, xmax):
+						if self.cellspace[x][y] == 1:
+							self.graph.plot(x, y, "black")
+				self.cellspace = self.generateCellspace2D(rulesets, self.cellspace, OPTIONS.wrap)
+				self.graph.update()
 
-	def generateCellspace1D(self, rulesets, state, wrap = False):
+	def generateCellspace1D(self, rulesets, state, wrap = True):
 		'''input: rulesets is a list of lists of integers
 		(i.e. [[-1,0,1], [-1,1], [0]]), where 0 is the
 		cell of interest, and state is a 1D array of
@@ -633,4 +708,42 @@ class DrawScreen(Screen):
 						and all(0 < cell + index < wrap_amount - 1 and state[(cell + index)] == 0 for index in ruleset['off'])):
 							newstate[cell + OPTIONS.interest] = 1
 							break			
+		return newstate
+
+	def generateCellspace2D(self, rulesets, state, wrap = True):
+		'''input: rulesets is a list of lists of coordinates
+		(i.e. [[[-1,0],[1,2]], [[-1,1]], [[0,2],[-1,2],[-2,0]]]),
+		where [0,0] is the cell of interest, and state is a 2D array of
+		the current state of all cells in the cell space
+		wrap is a boolean that states whether or not the
+		cell space is a wrapping cell space'''
+		wrap_x, wrap_y = len(state), len(state[0])
+		newstate = [[0] * wrap_y for i in xrange(wrap_x)]
+		if wrap:
+			for cell in xrange(wrap_x):
+				for row in xrange(wrap_y):
+					count = 0
+					# iterate over the adjacent cells
+					for y in xrange(-1, 2):
+						for x in xrange(-1, 2):
+							# count the number of "on" cells
+							if state[(cell + x) % wrap_x - 1][(row + y) % wrap_y - 1] == 1:
+								count += 1
+					for rule in rulesets:
+						rule = rule['on'][0]
+						if int(rule) == count:
+							newstate[(cell + OPTIONS.interest[0]) % wrap_x][(row + OPTIONS.interest[1]) %wrap_y] = 1
+							break
+		else:
+			for cell in xrange(wrap_x):
+				for row in xrange(wrap_y):
+					count = 0
+					for y in xrange(-1, 2):
+						for x in xrange(-1, 2):
+							if ((0 < cell + x < wrap_x - 1) and (0 < row + y < wrap_y- 1) and (state[(cell + x)][(row + y)] == 1)):
+								count += 1
+					for rule in rulesets:
+						rule = rule['on'][0]
+						if int(rule) == count:
+							newstate[cell + x + OPTIONS.interest[0]][row + y + OPTIONS.interest[1]] = 1
 		return newstate

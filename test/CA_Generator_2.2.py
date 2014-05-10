@@ -104,7 +104,7 @@ def generateCellSpace2D(rulesets, state, wrap = False, totalistic = False):
 						if all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 1 for index in ruleset['on']): #and all(state[(cell + index[0]) % wrap_amount][(row + index[1]) % wrap_amount] == 0 for index in ruleset['off']):
 							newstate[(cell % wrap_amount)][(row % wrap_amount)] = 1
 							break
-		else:
+		else: # wrap_amount has to be different for BOTH width and height
 			for cell in range(wrap_amount):
 				for row in range(wrap_amount):
 					count = 0
@@ -133,10 +133,10 @@ def generateCellSpace2D(rulesets, state, wrap = False, totalistic = False):
 						for x in range(-1, 2):
 							if ((0 < cell + x < wrap_amount - 1) and (0 < row + y < wrap_amount - 1) and (state[(cell + x)][(row + y)] == 1)):
 								count += 1
-							for rule in rulesets:
-								rule = rule['on'][0]
-								if int(rule) == count:
-									newstate[cell + x][row + y] = 1
+					for rule in rulesets:
+						rule = rule['on'][0]
+						if int(rule) == count:
+							newstate[cell][row] = 1
 	return newstate
 									
 
