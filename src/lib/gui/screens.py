@@ -58,6 +58,22 @@ class Screen(tk.Frame):
 		self.nextButton = tk.Button(self, text = next, command = lambda: nextCommand() + self.WM.open(self.next))
 		self.prevButton = tk.Button(self, text = prev, command = lambda: prevCommand() + self.WM.open(self.prev))
 
+	def openHelp(self):
+		'''Opens the Help window'''
+		helpWindow = tk.Toplevel(self.master)
+		label = tk.Label(helpWindow, text = self.helpText, style = "Help.TLabel", wrap = SETTINGS.height)
+		closeButton = tk.Button(helpWindow, text = "Ok", style = 'Quit.TButton', command = helpWindow.close)
+		label.grid(row = 1, pady = 5)
+		closeButton.grid(row = 2, pady = 5)
+
+		helpWindow.center()
+		helpWindow.mainloop()
+
+	def addHelp(self, text = ""):
+		"""Adds a help button and window"""
+		self.helpText = text
+		self.helpButton = tk.Button(self, text = "Help", command = self.openHelp, style = "Help.TButton")
+
 class RuleDisplay(tk.Frame):
 	'''Displays a set of Celullar Automata rules'''
 	def __init__(self, master, width = 5):
@@ -161,7 +177,6 @@ class HistoryScreen(Screen):
 		self.displayed = []
 
 		self.mainLabel = tk.Label(self, text = "History", style = "Subheader.TLabel")
-		self.helpLabel = tk.Label(self, text = HELP.history.text, style = "Help.TLabel")
 		self.searchLabel = tk.Label(self, text = "Search")
 		self.searchEntry = tk.Entry(self, justify = tk.CENTER, command = self.filter)
 		self.historyFrame = tk.Frame(self)
@@ -169,15 +184,16 @@ class HistoryScreen(Screen):
 		self.prevRowsButton = tk.Button(self, text = "Previous", command = lambda: self.next(-10))
 		self.nextRowsButton = tk.Button(self, text = "Next", command = lambda: self.next(10))
 		self.addNavigator(prev = "Home")
+		self.addHelp(HELP.history.text)
 		self.current_rows = (0, 10)
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.helpLabel,
 			# (self.searchLabel, self.searchEntry),
 			self.historyFrame,
 			self.clearButton,
 			(self.prevRowsButton, self.nextRowsButton),
+			self.helpButton,
 			self.prevButton,
 			], padx = 5, pady = 5)
 
@@ -334,7 +350,6 @@ class SettingsScreen(Screen):
 		self.fullscreenVar = tk.IntVar(self)
 		self.fullscreenVar.set(SETTINGS.fullscreen)
 		self.fullscreenOption = tk.Checkbutton(self, text = "Fullscreen", variable = self.fullscreenVar)
-		self.helpLabel = tk.Label(self, text = HELP.settings.text, style = "Help.TLabel")
 		self.widthLabel = tk.Label(self, text = "Width", style = "OptionHeader.TLabel")
 		self.widthSlider = tk.LabelledScale(self, type = int, from_ = 1, to = tk.SCREENDIM["width"],
 			length = 250, default = SETTINGS.width, step = 2, edit = True)
@@ -349,10 +364,10 @@ class SettingsScreen(Screen):
 		self.saveButton = tk.Button(self, text = "Apply", command = self.saveSettings)
 		self.defaultButton = tk.Button(self, text = "Reset to Default", command = self.loadDefaults, style = "Quit.TButton")
 		self.addNavigator()
+		self.addHelp(HELP.settings.text)
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.helpLabel,
 			self.fullscreenOption,
 			(self.fontLabel, self.fontEntry),
 			(self.sizeLabel, self.sizeSlider),
@@ -360,8 +375,13 @@ class SettingsScreen(Screen):
 			(self.heightLabel, self.heightSlider),
 			self.saveButton,
 			self.defaultButton,
+			self.helpButton,
 			self.prevButton,
 			], padx = 5, pady = 5)
+
+	def onload(self):
+		'''Resets the font'''
+		initializeStyles(self.master, SETTINGS.size)
 
 	def saveSettings(self, get = True):
 		'''Saves the settings'''
@@ -423,7 +443,6 @@ class Options_CellspaceScreen(Screen):
 	def createInterface(self):
 		'''Creates the interface for the Cellspace Options window'''
 		self.mainLabel = tk.Label(self, text = "Cellspace", style = "Subheader.TLabel")
-		self.helpLabel = tk.Label(self, text = HELP.cellspace.text, style = "Help.TLabel", wrap = 500)
 		self.dimensionVar = tk.IntVar(self)
 		self.dimensionVar.set(OPTIONS.dimension)
 		self.wrapVar = tk.IntVar(self)
@@ -437,12 +456,13 @@ class Options_CellspaceScreen(Screen):
 		self.wrapOption = tk.Checkbutton(self, text = "Wrap", variable = self.wrapVar)
 
 		self.addNavigator()
+		self.addHelp(HELP.cellspace.text)
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.helpLabel,
 			(self.dim1D, self.dim2D),
 			self.wrapOption,
+			self.helpButton,
 			(self.prevButton, self.nextButton)
 			], pady = 5)
 
@@ -461,16 +481,16 @@ class Options_InterestScreen(Screen):
 	def createInterface(self):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
-		self.helpLabel = tk.Label(self, text = HELP.interest.text, style = "Help.TLabel")
 		self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 		self.caGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		self.caGrid.toggle([0, 2]) # toggle the first cell as default
 		self.addNavigator()
+		self.addHelp(HELP.interest.text)
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.helpLabel,
 			self.caGrid,
+			self.helpButton,
 			(self.prevButton, self.nextButton),
 			], pady = 5)
 
@@ -490,7 +510,7 @@ class Options_InterestScreen(Screen):
 			# dimension changed --- create a new CAGrid
 			self.caGrid.mainFrame.grid_remove()
 			self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
-			self.caGrid.grid(row = 3, padx = 5, pady = 5, columnspan = 3)
+			self.caGrid.grid(row = 2, padx = 5, pady = 5, columnspan = 3)
 			self.caGrid.draw(5, newHeight)
 		interest = map(lambda x: x + 2, OPTIONS.interest) if isinstance(OPTIONS.interest, list) else [OPTIONS.interest + 2, 0]
 		self.caGrid.clickCell(*interest)
@@ -507,17 +527,17 @@ class Options_RuleScreen(Screen):
 		self.currentRule = 1
 		self.rules = {}
 		self.mainLabel = tk.Label(self, text = "Rules", style = "Subheader.TLabel")
-		self.helpLabel = tk.Label(self, text = HELP.rules.text, style = "Help.TLabel")
 		self.ruleFrame = RuleDisplay(self, 5)
 		self.addRuleButton = tk.Button(self, text = "Add Rule", command = self.addRule)
 		self.addNavigator()
+		self.addHelp(HELP.rules.text)
 
 		self.gridWidgets([
 			self.mainLabel,
-			self.helpLabel,
 			self.ruleFrame,
 			self.addRuleButton,
-			(self.prevButton, self.nextButton),
+			self.helpButton,
+			(self.prevButton, self.nextButton)
 			], pady = 5)
 
 	def addRule(self):
@@ -577,8 +597,7 @@ class DrawScreen(Screen):
 		self.ca_grid.draw(OPTIONS.width, OPTIONS.height, False)
 		self.ca_grid.clickCell(OPTIONS.width / 2, 0, True)
 
-		self.mainLabel = tk.Label(self, text = "Automata", style = "Subheader.TLabel")
-		self.helpLabel = tk.Label(self, text = HELP.draw.text, style = "Help.TLabel", wrap = SETTINGS.width)
+		self.mainLabel = tk.Label(self, text = "Automaton", style = "Subheader.TLabel")
 		self.examplesFrame = tk.Frame(self)
 		self.exampleLabel = tk.Label(self, text = "Examples", style = "OptionHeader.TLabel")
 		self.ruleFrame = RuleDisplay(self, 5)
@@ -588,13 +607,15 @@ class DrawScreen(Screen):
 		self.drawButton = tk.Button(self, text = "Draw", command = self.draw)
 		self.editButton = tk.Button(self, text = "Edit", command = self.edit, state = tk.DISABLED)
 		self.addNavigator()
+		self.addHelp(HELP.draw.text)
 		self.addExamples()
 
 		self.gridWidgets([
-			(self.exampleLabel, self.helpLabel, self.ruleLabel),
+			(self.exampleLabel, self.mainLabel, self.ruleLabel),
 			(self.examplesFrame, self.graph, self.ruleFrame),
 			(self.prevButton, self.drawButton, self.nextButton),
 			self.editButton,
+			self.helpButton,
 			], padx = 5, pady = 5)
 
 		self.graph.grid_remove()
@@ -622,9 +643,10 @@ class DrawScreen(Screen):
 	def onload(self, force = False):
 		'''Draws the Cellular Automata screen'''
 		# add the latest rules to the history database, only if the entry is unique
-		if OPTIONS.rules and not DATABASE.fetch(DATABASE.select("history", equal = {"rule": str(OPTIONS.rules)})):
-			DATABASE.insert("history", dimension = OPTIONS.dimension, interest = str(OPTIONS.interest),
-				rule = str(OPTIONS.rules), wrap = int(OPTIONS.wrap))
+		if OPTIONS.rules and not DATABASE.fetch(DATABASE.select("history", 
+			equal = {"rule": str(OPTIONS.rules), "interest": str(OPTIONS.interest), "wrap": int(OPTIONS.wrap)})):
+				DATABASE.insert("history", dimension = OPTIONS.dimension, interest = str(OPTIONS.interest),
+					rule = str(OPTIONS.rules), wrap = int(OPTIONS.wrap))
 		if self.graph.getHeight() != SETTINGS.height or self.graph.getWidth() != SETTINGS.width:
 			# width or height settings changed
 			self.graph.configure(width = SETTINGS.width, height = SETTINGS.height)

@@ -1,7 +1,7 @@
 <?xml version = "1.0" encoding = "utf-8"?> 
 <data>
 	<!-- Any changes here will carry throughout the entire project -->
-	<title>Chaos Automata</title>
+	<title>Chaotic Automata</title>
 	<authors>Rushy Panchal, George Georges, and Krish Pamani</authors>
 	<copyright>&#169; <!--Copyright Symbol --> Rushy Panchal and George Georges 2014.</copyright>
 	<credits>
@@ -16,33 +16,44 @@
 		<!-- Specific Help Text -->
 		<settings>
 			The width and height is the size of the Cellular Automata grids (in pixels).
+
 			The program font and font size can also be changed, as well as fullscreen mode.
 		</settings>
 		<history>
 			The user history is a record of all the previous automata run.
+
 			By clicking on an automaton's number, more detailed information can be viewed about it.
 			In addition, any history record can be deleted, or every item can be deleted using the "Clear" button.
 		</history>
 		<cellspace>
 			The cellspace is the entire grid of cells.
+
 			It can be 1 or 2 dimensional, and has a "wrap" mode. if wrap is enabled, the edges will wrap around to the other side.
 		</cellspace>
 		<interest>
 			 The Cell of Interest is the cell that is turned on when a particular rule pattern is matched.
-			 Generally, this is the center cell in the neighborhood, but it can be anything.
+			 Generally, this is the center cell in the neighborhood, but it can be anything in the surrounding neighborhood.
+			 
 			 To select a cell, click on it.
-			 Only one cell should be clicked.
+			 Only one cell should be clicked (any other clicked cells will be disregarded).
 		</interest>
 		<rules>
 			Rules are specific patterns that have to be matched.
-			To select a cell in the input, simply click on it.
+			To select a cell in the input grid, simply click on it.
 
 			For 1-dimensional Cellular Automata, the cell of interest is turned to the "on" state only if the rule matches exactly.
+
 			For 2-dimensional Automata, the cell of interest is turned on if the number of adjacent cells matches the amount of selected cells.
 		</rules>
 		<draw>
 			An initial cellstate can be selected by clicking or dragging the mouse on the screen below.
+
 			For 1-Dimensional Automata, only the first row is considered (the whole grid is used for 2-Dimensional).
+
+			Presets can be selected from the Examples on the left. This will override the current settings.
+			In addition, the automaton can be paused by pressing the "Pause" button. While paused, the current cellstate can be edited by using the "Edit" button.
+
+			The current selected rules are displayed on the right side. However, to edit them, you must go back to the previous "Rules" screen.
 		</draw>
 	</help>
 </data>

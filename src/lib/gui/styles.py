@@ -27,4 +27,6 @@ def initializeStyles(window, size = None):
 		font = (BASE_FONT, size + 2))
 	tk.configureStyle(STYLES["Label"], "Help.TLabel", foreground = "darkgreen",
 		font = (BASE_FONT, size))
+	tk.configureStyle(STYLES["Button"], "Help.TButton", foreground = "blue",
+		font = (BASE_FONT, size))
 	

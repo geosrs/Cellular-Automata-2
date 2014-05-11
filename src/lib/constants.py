@@ -75,7 +75,7 @@ def setOption(key, value = None):
 
 def saveSettings(d):
 	'''Saves the settings as a new dictionary'''
-	SETTINGS = d
+	SETTINGS.update(d)
 	with open(SETTINGS_PATH, 'w') as SETTINGS_FILE:
 		SETTINGS_FILE.write(json.dumps(d, indent = 4).replace('    ', '\t'))
 
