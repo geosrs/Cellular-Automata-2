@@ -24,11 +24,11 @@ DEFAULT_DIR = os.path.join(LIB_DIR, "defaults")
 DATA_PATH = os.path.join(LIB_DIR, "data.xml")
 SETTINGS_PATH = os.path.join(USER_DIR, "settings.json")
 DEFAULT_SETTINGS_PATH = os.path.join(DEFAULT_DIR, "settings.json")
-DATABASE_PATH = os.path.join(USER_DIR, "rules.db")
+DATABASE_PATH = os.path.join(USER_DIR, "history.db")
 IMAGE_PATHS = {name: os.path.join(IMAGES_DIR, name) for name in os.listdir(IMAGES_DIR)}
 
 # retrieve data from the various files
-DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.TEXT)
+DATA = xml.dictionary(DATA_PATH, xml.FILE, contains = xml.ALL)
 
 with open(SETTINGS_PATH, 'r') as SETTINGS_FILE:
 	SETTINGS = xml.Object.fromDictionary(json.load(SETTINGS_FILE))
@@ -61,7 +61,7 @@ OPTIONS = xml.Object({
 	"width": 400,
 	"height": 400,
 	"dimension": 1,
-	"interest": 2,
+	"interest": 0,
 	"wrap": True,
 	"rules": [],
 	})

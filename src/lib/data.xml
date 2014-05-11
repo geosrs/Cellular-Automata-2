@@ -1,3 +1,4 @@
+<?xml version = "1.0" encoding = "utf-8"?> 
 <data>
 	<!-- Any changes here will carry throughout the entire project -->
 	<title>Chaos Automata</title>
@@ -10,60 +11,9 @@
 	</credits>
 	<about>
 		<!-- About Text Goes Here -->
-		INSERT ABOUT TEXT HERE
-		What is Cellular Automata?
-		•	A cellular automata is a grid of cells. Each cell is defined by its state.
-		•	States
-		•	 The state of a cell can be as simple as either on or off, or it can be one of hundreds of choices.
-		•	The cell state is determined by a set of rules.
-		•	Rules
-		•	The rules are a list of requirements that the cell must meet in order to be a certain state.
-		•	Cell of interest
-		•	 The cell of interest is any cell that the program is examining at the time. Each cell of interest has a neighborhood.
-		•	The neighborhood
-		•	 The cells surrounding the cell of interest is called the neighborhood. The neighborhood cell’s states are what determine the cell of interest's state. 
-		Behavior 
-		•	The cellular automata normally starts with all of the cells set to a pre decided state.
-		•	The computer analyzes all of the cell to determine their new state. Every time the grid is analyzed it is called a generation 
-		•	These generations are shown one after another creating a moving pattern on the screen. 
-		Totalistic cellular automata
-		•	The rules for the cell of interest depend only on the total or average of the neighborhood cell states. The order in which the states are presented does not matter.
-		Non totalistic cellular automata 
-		•	The rules for the cell of interest depend on a specific arrangement of states in the neighboring cells.
-		Dimensions 
-		•	The 2D cellular automata is shown on a 2D grid it looks like:
-		 
-
-		•	The 1D cellular automata is displayed by showing how the generations change generation by generation. It looks like this:
-		 
-
-
-		Our program 
-		1D cellular automata 
-		•	Totalistic – the neighborhood is restricted to the neighboring cells of the cell of interest 
-		•	Non totalistic - the neighborhood is not restricted
-
-		2D cellular automata 
-		•	Totalistic – the cellular automata is restricted to a 3X3 grid
-		•	Non totalistic – the cellular automata is restricted to a 5X5 grid
-		•	
-		History of cellular automata 
-		•	Cellular Automata have their origin in systems described by John Von Neumann and Stanislaw Marcin Ulam
-		•	Cellular Automaton was discovered trying to replicate an abstract model of self-reproduction in biology.
-		•	During the 1960s, people had whimsical discussion of building actual self-reproducing automata. 
-		Wolfram neighborhood
-		•	It is one of the simplest one dimensional cellular automata.
-		•	There are 28=256 elementary cellular automata, because it uses a 8 digit binary system.
-		•	The picture on the bottom left are the basic 8 rules for the wolfram neighborhood.  
-		 
-		•	There are 256 rules for the Wolfram Neighborhood. 
-		•	Ex. 000111102 = 2+4+8+16 = 30, so this would be a rule 30 cellular automaton
-		•	When this rule is iterated, it would look like this
-
- 
-
 	</about>
 	<help>
+		<!-- Specific Help Text -->
 		<settings>
 			The width and height is the size of the Cellular Automata grids (in pixels).
 			The program font and font size can also be changed, as well as fullscreen mode.
@@ -80,12 +30,19 @@
 		<interest>
 			 The Cell of Interest is the cell that is turned on when a particular rule pattern is matched.
 			 Generally, this is the center cell in the neighborhood, but it can be anything.
+			 To select a cell, click on it.
+			 Only one cell should be clicked.
 		</interest>
 		<rules>
 			Rules are specific patterns that have to be matched.
-			For 1-dimensional Cellular Automata, the cell of interest is turned to the "on" state only if the rule matches exactly.
+			To select a cell in the input, simply click on it.
 
+			For 1-dimensional Cellular Automata, the cell of interest is turned to the "on" state only if the rule matches exactly.
 			For 2-dimensional Automata, the cell of interest is turned on if the number of adjacent cells matches the amount of selected cells.
 		</rules>
+		<draw>
+			An initial cellstate can be selected by clicking or dragging the mouse on the screen below.
+			For 1-Dimensional Automata, only the first row is considered (the whole grid is used for 2-Dimensional).
+		</draw>
 	</help>
 </data>

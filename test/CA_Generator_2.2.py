@@ -79,6 +79,7 @@ def generateCA(window, cellspace, rules, width, height, dimension, wrap = True, 
 			xmin, xmax  = 0, width
 			rulesets = [{'on': rule, 'off': [list(set(range(0, 10)) - set(rule))]} for rule in rules]
 			for i in range(100):
+				window.clear()
 				for y in reversed(range(ymin, ymax)):
 					for x in range(xmin, xmax):
 						if cellspace[x][y] == 1:

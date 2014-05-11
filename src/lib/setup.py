@@ -18,8 +18,8 @@ LIB_DIR = os.path.join(CUR_DIR, "lib")
 DEFAULT_DIR = os.path.join(LIB_DIR, "defaults")
 
 FILES = ["settings.json"]
-SQL_FILE = "rules.sql"
-DB_PATH = os.path.join(USER_DIR, "rules.db")
+SQL_FILE = "history.sql"
+DB_PATH = os.path.join(USER_DIR, "history.db")
 
 def run():
 	'''Sets up the program'''
