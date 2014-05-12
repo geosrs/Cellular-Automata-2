@@ -2,14 +2,14 @@ Chaotic-Automata
 =================
 
 Features of Chaotic Automata:
-	* 1-Dimensional (Non-Totalistic) and 2-Dimensional (Totalistic) Automata
-	* Wrap mode
-	* Supports an unlimited number of rules
-	* Allows different Cells of Interest
-	* Custom initial cellstate
-	* Various Preset Examples
-	* Automatic Automaton History Recording (can run previous automata)
-	* Settings Editor (including Font, Fullscreen, Color, etc.)
+* 1-Dimensional (Non-Totalistic) and 2-Dimensional (Totalistic) Automata
+* Wrap mode
+* Supports an unlimited number of rules
+* Allows different Cells of Interest
+* Custom initial cellstate
+* Various Preset Examples
+* Automatic Automaton History Recording (can run previous automata)
+* Settings Editor (including Font, Fullscreen, Color, etc.)
 
 DEVELOPER DISCLAIMER
 
