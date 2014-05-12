@@ -1,5 +1,5 @@
 # lib.setup.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Cellular Automata Project
 # Sets the program up
 

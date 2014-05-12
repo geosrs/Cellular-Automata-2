@@ -1,5 +1,5 @@
 # gui.grid.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Cellular Automata Project
 # Contains the CAGrid and CACell classes
 

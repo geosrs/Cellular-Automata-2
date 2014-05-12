@@ -1,5 +1,5 @@
 # main.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Main Cellular Automata Project
 
 ### Imports

@@ -3,6 +3,7 @@
 	"width": 500, 
 	"font": "Century Gothic",
 	"size": 12,
+	"color": "black",
 	"initial": true, 
 	"fullscreen": false
 }

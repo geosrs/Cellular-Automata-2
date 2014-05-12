@@ -1,5 +1,5 @@
 # gui.screens.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Cellular Automata Project
 # Contains the window screens
 
@@ -153,7 +153,7 @@ class AboutScreen(Screen):
 	def createInterface(self):
 		'''Creates the main About interface'''
 		self.mainLabel = tk.Label(self, text = "About", style = "Subheader.TLabel")
-		self.aboutText = tk.ScrolledText(self, height = 10, font = "Calibri 12")
+		self.aboutText = tk.ScrolledText(self, height = 20, font = "Calibri 12", width = 100, wrap = tk.WORD)
 		self.aboutText.insert(tk.END, DATA.about.text)
 		self.aboutText.configure(state = tk.DISABLED)
 		self.addNavigator(prev = "Home")
@@ -268,7 +268,7 @@ class HistoryScreen(Screen):
 			newRuleFrame = tk.Frame(ruleFrame)
 			newRuleFrame.number = n
 			ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = n), style = "OptionHeader.TLabel")
-			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if dimension == 1 else SETTINGS.height / 2)
+			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if dimension == 1 else SETTINGS.height / 2, activeColor = SETTINGS.color)
 			ruleGrid.draw(5, 1 if dimension == 1 else 5)
 			if dimension == 1: # show the current cells
 				for x in rule:
@@ -361,6 +361,9 @@ class SettingsScreen(Screen):
 		self.fontEntry.insert(tk.END, SETTINGS.font)
 		self.sizeLabel = tk.Label(self, text = "Font Size", style = "OptionHeader.TLabel")
 		self.sizeSlider = tk.LabelledScale(self, type = int, from_ = 8, to = 24, length = 250, default = SETTINGS.size, step = 1, edit = True)
+		self.colorLabel = tk.Label(self, text = "Cell Color", style = "OptionHeader.TLabel")
+		self.colorEntry = tk.Entry(self, width = 20, justify = tk.CENTER)
+		self.colorEntry.insert(tk.END, SETTINGS.color)
 		self.saveButton = tk.Button(self, text = "Apply", command = self.saveSettings)
 		self.defaultButton = tk.Button(self, text = "Reset to Default", command = self.loadDefaults, style = "Quit.TButton")
 		self.addNavigator()
@@ -373,6 +376,7 @@ class SettingsScreen(Screen):
 			(self.sizeLabel, self.sizeSlider),
 			(self.widthLabel, self.widthSlider),
 			(self.heightLabel, self.heightSlider),
+			(self.colorLabel, self.colorEntry),
 			self.saveButton,
 			self.defaultButton,
 			self.helpButton,
@@ -391,6 +395,7 @@ class SettingsScreen(Screen):
 			SETTINGS.size = self.sizeSlider.get()
 			SETTINGS.width = self.widthSlider.get()
 			SETTINGS.height = self.heightSlider.get()
+			SETTINGS.color = self.colorEntry.get()
 
 		# apply any changes
 		if SETTINGS.fullscreen:
@@ -481,7 +486,7 @@ class Options_InterestScreen(Screen):
 	def createInterface(self):
 		'''Creates the Cell of Interest interface'''
 		self.mainLabel = tk.Label(self, text = "Cell of Interest", style = "Subheader.TLabel")
-		self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+		self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2, activeColor = SETTINGS.color)
 		self.caGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		self.caGrid.toggle([0, 2]) # toggle the first cell as default
 		self.addNavigator()
@@ -509,11 +514,12 @@ class Options_InterestScreen(Screen):
 		if newHeight != self.caGrid.height:
 			# dimension changed --- create a new CAGrid
 			self.caGrid.mainFrame.grid_remove()
-			self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+			self.caGrid = CAGrid(self, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2, activeColor = SETTINGS.color)
 			self.caGrid.grid(row = 2, padx = 5, pady = 5, columnspan = 3)
 			self.caGrid.draw(5, newHeight)
 		interest = map(lambda x: x + 2, OPTIONS.interest) if isinstance(OPTIONS.interest, list) else [OPTIONS.interest + 2, 0]
 		self.caGrid.clickCell(*interest)
+		self.caGrid.activeColor = SETTINGS.color
 		return True
 
 class Options_RuleScreen(Screen):
@@ -547,7 +553,7 @@ class Options_RuleScreen(Screen):
 		self.rules[self.currentRule] = newRuleFrame
 		newRuleFrame.number = self.currentRule
 		ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = self.currentRule), style = "OptionHeader.TLabel")
-		ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+		ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2, activeColor = SETTINGS.color)
 		ruleGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 		newRuleFrame.ca_grid = ruleGrid
 
@@ -570,6 +576,7 @@ class Options_RuleScreen(Screen):
 				grid = rule.ca_grid
 				# grid.configure(height = SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
 				grid.draw(5, newHeight)
+				grid.activeColor = SETTINGS.color
 		return True
 
 	def setOptions(self):
@@ -590,7 +597,7 @@ class DrawScreen(Screen):
 
 	def createInterface(self):
 		'''Creates the main CA interface'''
-		self.ca_grid = CAGrid(self, SETTINGS.width, SETTINGS.height, activeColor = "red")
+		self.ca_grid = CAGrid(self, SETTINGS.width, SETTINGS.height, activeColor = SETTINGS.color)
 		self.graph = graph.GraphWin(self, width = SETTINGS.width, height = SETTINGS.height, autoflush = False)
 		self.graph.setBackground("white")
 		self.ca_grid.setBackground("white")
@@ -651,6 +658,7 @@ class DrawScreen(Screen):
 			# width or height settings changed
 			self.graph.configure(width = SETTINGS.width, height = SETTINGS.height)
 			self.ca_grid.configure(width = SETTINGS.width, height = SETTINGS.height)
+		self.ca_grid.activeColor = SETTINGS.color
 		# show the current rules on the side
 		for n, frame in self.ruleFrame.rules.items(): # remove the current frames
 			frame.grid_forget()
@@ -659,7 +667,7 @@ class DrawScreen(Screen):
 			newRuleFrame = tk.Frame(self.ruleFrame)
 			newRuleFrame.number = n
 			ruleLabel = tk.Label(newRuleFrame, text = "Rule {n}".format(n = n), style = "OptionHeader.TLabel")
-			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2)
+			ruleGrid = CAGrid(newRuleFrame, SETTINGS.width / 2, SETTINGS.height / 10 if OPTIONS.dimension == 1 else SETTINGS.height / 2, activeColor = SETTINGS.color)
 			ruleGrid.draw(5, 1 if OPTIONS.dimension == 1 else 5)
 			# show the current cells
 			if OPTIONS.dimension == 1:
@@ -735,7 +743,7 @@ class DrawScreen(Screen):
 					for x in xrange(len(self.cellspace)):
 						# plot the "on" cells
 						if self.cellspace[x] == 1:
-							self.graph.plot(x, y, "black")
+							self.graph.plot(x, y, SETTINGS.color)
 					self.cellspace = self.generateCellspace1D(rulesets, self.cellspace, OPTIONS.wrap)
 					self.graph.update() # window updates after every row
 					if not self.drawing:
@@ -761,7 +769,7 @@ class DrawScreen(Screen):
 				for y in reversed(xrange(ymin, ymax)):
 					for x in xrange(xmin, xmax):
 						if self.cellspace[x][y] == 1:
-							self.graph.plot(x, y, "black")
+							self.graph.plot(x, y, SETTINGS.color)
 				self.cellspace = self.generateCellspace2D(rulesets, self.cellspace, OPTIONS.wrap)
 				self.graph.update()
 

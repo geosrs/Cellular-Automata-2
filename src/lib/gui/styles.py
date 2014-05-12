@@ -1,5 +1,5 @@
 # gui.styles.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Cellular Automata Project
 # Contains all styling methods
 

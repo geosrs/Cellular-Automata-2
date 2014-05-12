@@ -1,5 +1,5 @@
 # lib.examples.py
-# Rushy Panchal, Krish Pamani, George Georges, Naomi Popkin, Allan Lee
+# Rushy Panchal and George Georges
 # Cellular Automata Project
 # Contains various Cellular Automata examples
 
